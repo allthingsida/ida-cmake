@@ -21,7 +21,7 @@ This variable should point to where you unpacked IDA's SDK
 
 ## IDABIN
 
-The `IDABIN` environment variable should point to where you have IDA executables folder.
+The `IDABIN` environment variable, is optional, should point to where you have IDA executables folder.
 Since in most cases the IDA binaries are located in a non-writable path (Program Files for example), two cases are advised here:
 
 - `C:\Users\[username]\AppData\Roaming\Hex-Rays\IDA Pro`
@@ -51,7 +51,12 @@ include($ENV{IDASDK}/ida-cmake/plugins.cmake)
 * `PLUGIN_OUTPUT_NAME` is an optional variable that lets you override the binary file name. This is useful if you want to have your plugin load before other plugins (IDA sorts and loads plugins in alphabetical order)
 
 
-## Generating sources
+## Generating project files
+
+* Change the arguments below to `EA64=YES` if you want to build for `ida64`.
+* Add the argument `-DMAXSTR=<new_len>` to change the default value of `MAXSTR` from 1024.
+
+## On MS-Windows
 
 In your plugin source directory, type the following shell commands:
 ```
@@ -59,11 +64,10 @@ mkdir build
 cd build
 cmake -A x64 .. -DEA64=NO
 ```
-(note: change the arguments to `EA64=YES` if you want to build for `ida64`)
+(note: On MS-Windows, the default generator (CMake's `-G` switch) is Visual Studio, therefore it is omitted from the command line arguments above)
 
 Now you will have Visual Studio solution in this folder. You can build using Visual Studio or from the command line like this:
 
 ```
 cmake --build . --config Release
 ```
-
