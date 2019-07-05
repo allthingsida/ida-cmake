@@ -1,6 +1,9 @@
+#
+# CMake template for compiling more than one plugin
+#
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-set(PLUGIN_NAME              mysample)
-set(PLUGIN_SOURCES           mysample.cpp)
+project(AllPlugins)
 
-include($ENV{IDASDK}/ida-cmake/plugins.cmake)
+add_subdirectory(twoplugins)
+add_subdirectory(sample)

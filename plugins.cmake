@@ -1,6 +1,5 @@
-project(${PLUGIN_NAME})
-
-include($ENV{IDASDK}/ida-cmake/common.cmake)
+# Include common configuration
+include(${CMAKE_CURRENT_LIST_DIR}/common.cmake)
 
 # Create a library for the current plugin
 add_library(${PLUGIN_NAME} SHARED ${PLUGIN_SOURCES})
@@ -52,3 +51,18 @@ else()
     set_target_properties(${PLUGIN_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${IDABIN}/plugins)
     set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
 endif()
+
+# Set convenience user debugging information for MSVC projects
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    if (NOT DEFINED PLUGIN_RUN_ARGS)
+        set(PLUGIN_RUN_ARGS -t)
+    endif()
+    configure_file(
+        "${CMAKE_CURRENT_LIST_DIR}/plugins.vcxproj.user" 
+        "${PLUGIN_NAME}.vcxproj.user" 
+        @ONLY)
+endif()
+
+
+unset(PLUGIN_OUTPUT_NAME)
+unset(PLUGIN_RUN_ARGS)

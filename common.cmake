@@ -1,8 +1,8 @@
 # Specify the addressing mode for the addons
-option(EA64 "64bit addressing" OFF)
+set(EA64   OFF  CACHE BOOL     "64bit addressing")
 
 # Specify the default MAXSTR string buffer size
-set(MAXSTR 1024 CACHE STRING "MAXSTR value")
+set(MAXSTR 1024 CACHE STRING   "MAXSTR value")
 
 # Set and verify the SDK folder
 set(IDASDK $ENV{IDASDK})
@@ -17,7 +17,9 @@ if (NOT EXISTS "${IDABIN}")
     set(IDABIN $ENV{IDASDK}/bin)
     message("Setting default IDABIN folder to: ${IDABIN}")
 endif()
+file(TO_NATIVE_PATH ${IDABIN} IDABIN)
 
+# Set libraries path
 if (WIN32 AND MSVC)
     set(__NT__ 1)
     set(IDALIB32 ${IDASDK}/lib/x64_win_vc_32/ida.lib)
