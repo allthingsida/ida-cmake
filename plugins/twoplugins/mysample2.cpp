@@ -3,18 +3,18 @@
 #include <loader.hpp>
 #include <kernwin.hpp>
 
-int idaapi init(void)
+static plugmod_t *idaapi init(void)
 {
   msg("Plugin2 initialized!\n");
   return PLUGIN_OK;
 }
 
-void idaapi term(void)
+static void idaapi term(void)
 {
   msg("Plugin2 term()\n");
 }
 
-bool idaapi run(size_t arg)
+static bool idaapi run(size_t arg)
 {
   msg("Plugin2 run()\n");
   return true;
