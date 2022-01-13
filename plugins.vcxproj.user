@@ -6,7 +6,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommand>@IDABIN@\ida.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>@IDABIN@\@IDAEXE@</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>@PLUGIN_RUN_ARGS@</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>

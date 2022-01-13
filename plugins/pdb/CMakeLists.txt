@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
+project(pdb)
+
 # Included file
 list(APPEND DISABLED_SOURCES common.cpp 
 	misc.cpp msdia.cpp misc.cpp common.cpp pdblocal.cpp tilbuild.cpp sip.cpp
