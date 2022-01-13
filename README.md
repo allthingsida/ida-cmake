@@ -34,7 +34,14 @@ Since in most cases the IDA binaries are located in a non-writable path (Program
 
 If this envorinment variable is missing, then the compiled addons will be generated in `[IDASDK]\bin`.
 
-# Plugins
+# Plugins / Loaders
+
+Both plugins are loaders will be referred to as addons. In the `CMakeLists.txt` file, one can specify what kind of addon by simply specifying the name:
+
+- `set(PLUGIN_NAME  my_simple_plugin)`: specifies that this is a plugin
+- `set(LOADER_NAME  my_loader)`: specifies that this is a file loader module
+
+In the following subsections, we describe how to configure `ida-cmake` for plugin addons, however one can substitute `PLUGIN_` with `LOADER_` to achieve the same for file loaders.
 
 ## Customizing your plugin information
 

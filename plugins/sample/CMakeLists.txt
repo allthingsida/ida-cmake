@@ -6,4 +6,4 @@ project(mysample)
 set(PLUGIN_NAME              mysample)
 set(PLUGIN_SOURCES           mysample.cpp)
 set(PLUGIN_RUN_ARGS          "-t -z10000") # Debug messages for the debugger
-include($ENV{IDASDK}/ida-cmake/plugins.cmake)
+include($ENV{IDASDK}/ida-cmake/addons.cmake)
