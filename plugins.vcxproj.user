@@ -10,4 +10,9 @@
     <LocalDebuggerCommandArguments>@PLUGIN_RUN_ARGS@</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <LocalDebuggerCommand>@IDABIN@\@IDAEXE@</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>@PLUGIN_RUN_ARGS@</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
