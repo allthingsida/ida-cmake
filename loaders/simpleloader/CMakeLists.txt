@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-project(simpleloader)
+project(loader_template)
 
-set(LOADER_NAME  myloader)
-set(LOADER_SOURCES src.cpp src.h)
+set(LOADER_NAME    loader_template)
+set(LOADER_SOURCES loader_template.cpp)
 
 include($ENV{IDASDK}/ida-cmake/addons.cmake)
-
-set_source_files_properties(${DISABLED_SOURCES} PROPERTIES LANGUAGE "")
