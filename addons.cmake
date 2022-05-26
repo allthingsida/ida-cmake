@@ -43,6 +43,28 @@ elseif(DEFINED LOADER_NAME)
     if (NOT DEFINED LOADER_RUN_ARGS)
         set(LOADER_RUN_ARGS "-c -A")
     endif()
+elseif(DEFINED PROCMOD_NAME)
+    set(IS_PROCMOD 1)
+    set(ADDON_NAME ${PROCMOD_NAME})
+    set(ADDON_SOURCES ${PROCMOD_SOURCES})
+    set(ADDON_BIN "procs")
+    if (DEFINED PROCMOD_OUTPUT_NAME)
+        set(ADDON_OUTPUT_NAME ${PROCMOD_OUTPUT_NAME})
+        unset(PROCMOD_OUTPUT_NAME)
+    endif()
+    # Linker
+    if (DEFINED PROCMOD_LINK_LIBRARIES)
+        set(ADDON_LINK_LIBRARIES ${PROCMOD_LINK_LIBRARIES})
+        unset(PROCMOD_LINK_LIBRARIES)
+    endif()
+    # Include directories
+    if (DEFINED PROCMOD_INCLUDE_DIRECTORIES)
+        set(ADDON_INCLUDE_DIRECTORIES ${PROCMOD_INCLUDE_DIRECTORIES})
+        unset(PROCMOD_INCLUDE_DIRECTORIES)
+    endif()
+    if (NOT DEFINED PROCMOD_RUN_ARGS)
+        set(PROCMOD_RUN_ARGS "-c -A")
+    endif()
 endif()
 
 # Include common configuration
@@ -116,6 +138,14 @@ elseif(DEFINED IS_LOADER)
             "${LOADER_NAME}.vcxproj.user" 
             @ONLY)
     endif()
+elseif(DEFINED IS_PROCMOD)
+    # Set convenience user debugging information for MSVC projects
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        configure_file(
+            "${CMAKE_CURRENT_LIST_DIR}/procmod.vcxproj.user" 
+            "${PROCMOD_NAME}.vcxproj.user" 
+            @ONLY)
+    endif()
 endif()
 
 unset(ADDON_OUTPUT_NAME)
@@ -127,6 +157,8 @@ unset(PLUGIN_NAME)
 unset(PLUGIN_RUN_ARGS)
 unset(LOADER_NAME)
 unset(LOADER_RUN_ARGS)
+unset(PROCMOD_NAME)
+unset(PROCMOD_RUN_ARGS)
 # Mark disabled source files
 set_source_files_properties(${DISABLED_SOURCES} PROPERTIES LANGUAGE "")
 
