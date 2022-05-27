@@ -12,7 +12,7 @@ Clone this project into IDA SDK folder as such:
 <idasdk>\plugins
 <idasdk>\lib
 <idasdk>\bin
-<idasdk>ida-cmake
+<idasdk>\ida-cmake
 etc.
 ```
 
@@ -26,8 +26,8 @@ This variable should point to where you unpacked IDA's SDK
 
 ## IDABIN
 
-The, optional, `IDABIN` environment variable should point to where you have IDA executables folder.
-Since in most cases the IDA binaries are located in a non-writable path (Program Files for example), two cases are advised here:
+The optional `IDABIN` environment variable should point to IDA's installation location.
+Since in most cases the IDA binaries are located in a non-writable path (`Program Files` for example), two cases are advised here:
 
 - `C:\Users\[username]\AppData\Roaming\Hex-Rays\IDA Pro`
 - `[IDASDK]\bin`
@@ -36,7 +36,7 @@ If this envorinment variable is missing, then the compiled addons will be genera
 
 # Addons
 
-Plugins, File loaders, processor modules will be referred to as addons. In the `CMakeLists.txt` file, one can specify what kind of addon by simply specifying the name:
+Plugins, file loaders, processor modules will be referred to as addons. In the `CMakeLists.txt` file, one can specify what kind of addon by simply specifying the name:
 
 - `set(PLUGIN_NAME  my_simple_plugin)`: specifies that this is a plugin
 - `set(LOADER_NAME  my_loader)`: specifies that this is a file loader module
@@ -60,11 +60,17 @@ set(PLUGIN_OUTPUT_NAME       mysample-output)
 include($ENV{IDASDK}/ida-cmake/addons.cmake)
 ```
 
-* Specify the solution name with `project()`. This is relevant when you have more than one plugin in the same directory
+Specify the solution name with `project()`. This is relevant when you have more than one plugin in the same directory.
+
+Here are all the supported addon variables:
+
 * `PLUGIN_NAME` is the project name. It is also used as the binary name if the `PLUGIN_OUTPUT_NAME` is absent
 * `PLUGIN_SOURCES` is a space separated list of source files that make up the plugin
 * `PLUGIN_OUTPUT_NAME` is an optional variable that lets you override the binary file name. This is useful if you want to have your plugin load before other plugins (IDA sorts and loads plugins in alphabetical order)
+* `PLUGIN_LINK_LIBRARIES` additional link libraries used by the plugin.
+* `PLUGIN_INCLUDE_DIRECTORIES` additional include directories used by the plugin.
 * `PLUGIN_RUN_ARGS` specify the default command line arguments to pass when you run your plugins from the IDE (only works with Visual Studio). If not specified, then IDA will run with a temporary database (`-t` switch).
+* `DISABLED_SOURCES` is used to specify a list of source files that should be listed in the project but should not be compiled (they are meant to be used with `#include` for example).
 
 ### Two or more plugins sharing the same source files
 
