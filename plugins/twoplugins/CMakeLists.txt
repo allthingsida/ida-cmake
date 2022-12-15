@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 project(TwoPlugins)
 
+set(CMAKE_CXX_STANDARD 17)
+
 # Plugin 1
 set(PLUGIN_NAME              mysample1)
 set(PLUGIN_SOURCES           mysample1.cpp)

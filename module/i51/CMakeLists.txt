@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 project(i51)
 
+set(CMAKE_CXX_STANDARD 17)
+
 set(PROCMOD_NAME    i51)
 set(PROCMOD_SOURCES ana.cpp emu.cpp i51.hpp ins.cpp ins.hpp out.cpp reg.cpp)
                     
