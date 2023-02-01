@@ -1,6 +1,6 @@
 # CMakeLists for the i51 processor module sample from the IDA SDK
 
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 project(i51)
 
