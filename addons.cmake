@@ -1,5 +1,9 @@
+# For backwards compatibility, include the common configuration
+include(${CMAKE_CURRENT_LIST_DIR}/common.cmake)
+
 if (DEFINED PLUGIN_NAME)
     set(IS_PLUGIN 1)
+    set(ADDON_KIND "plugin")
     set(ADDON_NAME ${PLUGIN_NAME})
     set(ADDON_SOURCES ${PLUGIN_SOURCES})
     unset(PLUGIN_SOURCES)
@@ -23,6 +27,7 @@ if (DEFINED PLUGIN_NAME)
     endif()
 elseif(DEFINED LOADER_NAME)
     set(IS_LOADER 1)
+    set(ADDON_KIND "file loader")
     set(ADDON_NAME ${LOADER_NAME})
     set(ADDON_SOURCES ${LOADER_SOURCES})
     set(ADDON_BIN "loaders")
@@ -45,6 +50,7 @@ elseif(DEFINED LOADER_NAME)
     endif()
 elseif(DEFINED PROCMOD_NAME)
     set(IS_PROCMOD 1)
+    set(ADDON_KIND "processor module")
     set(ADDON_NAME ${PROCMOD_NAME})
     set(ADDON_SOURCES ${PROCMOD_SOURCES})
     set(ADDON_BIN "procs")
@@ -67,16 +73,13 @@ elseif(DEFINED PROCMOD_NAME)
     endif()
 endif()
 
-# Include common configuration
-include(${CMAKE_CURRENT_LIST_DIR}/common.cmake)
-
 # Create a library for the current plugin
 add_library(${ADDON_NAME} SHARED ${ADDON_SOURCES})
 
 # Set the default plugin output name
 if (NOT DEFINED ADDON_OUTPUT_NAME)
     set(ADDON_OUTPUT_NAME ${ADDON_NAME})
-    message("Setting default addon output file name to: ${ADDON_OUTPUT_NAME}")
+    message("-- Setting the default ${ADDON_KIND} output file name to: ${ADDON_OUTPUT_NAME}")
 endif()
 
 if (DEFINED __NT__)
@@ -112,7 +115,7 @@ if (DEFINED __NT__)
     set_property(TARGET ${ADDON_NAME} APPEND_STRING PROPERTY LINK_FLAGS " /SUBSYSTEM:WINDOWS")
 
     # Set the destination folder to be in IDA's binary output folder
-    foreach(cfg IN LISTS CMAKE_CONFIGURATION_TYPES)
+    foreach (cfg IN LISTS CMAKE_CONFIGURATION_TYPES)
         string(TOUPPER ${cfg} cfg)
         set_target_properties(${ADDON_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_${cfg} ${IDABIN}/${ADDON_BIN})
     endforeach()
@@ -153,15 +156,13 @@ unset(ADDON_NAME)
 unset(ADDON_BIN)
 unset(ADDON_SOURCES)
 unset(ADDON_LINK_LIBRARIES)
+unset(ADDON_KIND)
 unset(PLUGIN_NAME)
 unset(PLUGIN_RUN_ARGS)
 unset(LOADER_NAME)
 unset(LOADER_RUN_ARGS)
 unset(PROCMOD_NAME)
 unset(PROCMOD_RUN_ARGS)
+
 # Mark disabled source files
 set_source_files_properties(${DISABLED_SOURCES} PROPERTIES LANGUAGE "")
-
-function(disable_ida_warnings target)
-    target_compile_options(${target} PRIVATE "/wd4267" "/wd4244" "/wd4018")
-endfunction()

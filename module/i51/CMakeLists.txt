@@ -6,7 +6,10 @@ project(i51)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include($ENV{IDASDK}/ida-cmake/common.cmake)
+
 set(PROCMOD_NAME    i51)
 set(PROCMOD_SOURCES ana.cpp emu.cpp i51.hpp ins.cpp ins.hpp out.cpp reg.cpp)
-                    
-include($ENV{IDASDK}/ida-cmake/addons.cmake)
+
+generate()
+disable_ida_warnings(i51)
