@@ -2,7 +2,7 @@
 
 `ida-cmake` provides a convenience CMake build script template for compiling IDA addons on Windows, Linux and macOS (Intel or Apple Silicon). It requires very minimal set up and little to zero knowledge of the IDA SDK build system and how to configure it (especially on MS Windows, which can be very tedious).
 
->*`ida-cmake` has been tested the IDA SDK 7.2 and onwards.*
+>*`ida-cmake` has been tested with the IDA SDK 7.2 and onwards.*
 
 # Quick Start Guide
 
@@ -14,6 +14,7 @@ In few simple steps:
 
 Continue reading if you want to learn more about `ida-cmake`.
 
+There's also useful video on the [All Things IDA](https://www.youtube.com/@allthingsida) YouTube channel that shows you have to use `ida-cmake`: [https://youtu.be/P9nrKSPYaIM](https://youtu.be/P9nrKSPYaIM)
 # Installation
 
 Clone this project into the IDA SDK folder. The final folders layout should look like this:
