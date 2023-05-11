@@ -15,6 +15,7 @@ In few simple steps:
 Continue reading if you want to learn more about `ida-cmake`.
 
 There's also useful video on the [All Things IDA](https://www.youtube.com/@allthingsida) YouTube channel that shows you have to use `ida-cmake`: [https://youtu.be/P9nrKSPYaIM](https://youtu.be/P9nrKSPYaIM)
+
 # Installation
 
 Clone this project into the IDA SDK folder. The final folders layout should look like this:
