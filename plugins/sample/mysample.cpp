@@ -3,32 +3,26 @@
 #include <loader.hpp>
 #include <kernwin.hpp>
 
-static plugmod_t *idaapi init(void)
+//--------------------------------------------------------------------------
+struct plugin_ctx_t : public plugmod_t
 {
-  msg("Plugin initialized!\n");
-  return PLUGIN_OK;
-}
+    bool idaapi run(size_t) override
+    {
+        msg("Hello, world! xxx(cpp)\n");
+        return true;
+    }
+};
 
-static void idaapi term(void)
-{
-  msg("Plugin term()\n");
-}
-
-static bool idaapi run(size_t arg)
-{
-  msg("Plugin run()\n");
-  return true;
-}
-
+//--------------------------------------------------------------------------
 plugin_t PLUGIN =
 {
-  IDP_INTERFACE_VERSION,
-  PLUGIN_UNL,
-  init,
-  term,
-  run,
-  "",
-  "",
-  "Sample plugin",
-  ""
+    IDP_INTERFACE_VERSION,
+    PLUGIN_UNL | PLUGIN_MULTI,
+    []()->plugmod_t* {return new plugin_ctx_t; }, // initialize
+    nullptr,
+    nullptr,
+    nullptr,              // long comment about the plugin
+    nullptr,              // multiline help about the plugin
+    "Hello, world",       // the preferred short name of the plugin
+    nullptr,              // the preferred hotkey to run the plugin
 };
