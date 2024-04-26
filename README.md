@@ -10,7 +10,7 @@ In few simple steps:
 
 1. Clone `ida-cmake` to the IDA SDK installation folder
 2. Export a new environment variable called `IDASDK` and have it point to the IDA SDK folder
-3. Grab a template CMake [build script](plugins/sample) from the [plugins](plugins) folder form this repo.
+3. Grab a template CMake [build script](plugins/sample) from the [plugins](plugins) folder from this repo.
 
 Continue reading if you want to learn more about `ida-cmake`.
 
