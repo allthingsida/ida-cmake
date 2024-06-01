@@ -4,7 +4,7 @@ project(TwoPlugins)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include($ENV{IDASDK}/ida-cmake/common.cmake)
+include($ENV{IDASDK}/ida-cmake/idasdk.cmake)
 
 # Plugin 1
 set(PLUGIN_NAME              mysample1)
