@@ -5,7 +5,7 @@ project(mysample)
 # Plugin 1
 set(CMAKE_CXX_STANDARD 17)
 
-include($ENV{IDASDK}/ida-cmake/common.cmake)
+include($ENV{IDASDK}/ida-cmake/idasdk.cmake)
 
 set(PLUGIN_NAME              mysample)
 set(PLUGIN_SOURCES           mysample.cpp)

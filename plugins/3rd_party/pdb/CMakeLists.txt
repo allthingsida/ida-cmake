@@ -4,7 +4,7 @@ project(pdb)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include($ENV{IDASDK}/ida-cmake/common.cmake)
+include($ENV{IDASDK}/ida-cmake/idasdk.cmake)
 
 # Included file
 list(APPEND DISABLED_SOURCES common.cpp pdblocal.cpp 

@@ -58,6 +58,8 @@ message("-- Detected IDA SDK version: ${IDASDK_VERSION}")
 # Set libraries path
 if (WIN32 AND MSVC)
     set(__NT__ 1)
+    set(IDAPROPLAT   "__NT__")
+
     set(IDALIBSUFFIX "lib")
 
     set(IDALIBPATH32  "${IDASDK}/lib/x64_win_vc_32${IDALIBPATHSUFFIX}")
@@ -74,6 +76,8 @@ if (WIN32 AND MSVC)
     endif()
 elseif(APPLE)
     set(__MAC__ 1)
+    set(IDAPROPLAT "__MAC__")
+
     set(IDALIBSUFFIX "dylib")
 
     if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
@@ -87,6 +91,8 @@ elseif(APPLE)
     set(IDALIB64 ${IDALIBPATH64}/libida64.dylib)
 elseif(UNIX AND NOT APPLE)
     set(__LINUX__ 1)
+    set(IDAPROPLAT "__LINUX__")
+
     set(IDALIBSUFFIX "so")
 
     set(IDALIBPATH32  "${IDASDK}/lib/x64_linux_gcc_32${IDALIBPATHSUFFIX}")
@@ -109,7 +115,8 @@ else()
     set(IDALIB      "${IDALIB32}")
 endif()
 
-set(IDAPROLIB "${IDASLIBPATH}/pro.${IDALIBSUFFIX}")
+set(IDAPROLIB     "${IDASLIBPATH}/pro.${IDALIBSUFFIX}")
+set(IDAPROINCLUDE "${IDASDK}/include")
 
 # Convenience macro to include the addons script and create the proper targets
 # The addons script can be included many times, each time it generates a new target
@@ -129,4 +136,3 @@ function(disable_ida_warnings target)
         target_compile_options(${target} PRIVATE "/wd4267" "/wd4244" "/wd4018" "/wd4146")
     endif()
 endfunction()
-

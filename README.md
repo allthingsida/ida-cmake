@@ -76,7 +76,7 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 project(MyPluginProjectName)
 
-include($ENV{IDASDK}/ida-cmake/common.cmake)
+include($ENV{IDASDK}/ida-cmake/idasdk.cmake)
 
 set(PLUGIN_NAME          mysample)
 set(PLUGIN_SOURCES       mysample.cpp)
@@ -111,7 +111,7 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 project(TwoPlugins)
 
-include($ENV{IDASDK}/ida-cmake/common.cmake)
+include($ENV{IDASDK}/ida-cmake/idasdk.cmake)
 
 # Plugin 1
 set(PLUGIN_NAME              mysample1)
@@ -213,7 +213,7 @@ project(mysample)
 # Plugin 1
 set(CMAKE_CXX_STANDARD 17)
 
-include(${IDASDK}/ida-cmake/common.cmake)
+include(${IDASDK}/ida-cmake/idasdk.cmake)
 
 set(PLUGIN_NAME      mysample)
 set(PLUGIN_SOURCES   mysample.cpp)
@@ -236,4 +236,25 @@ or:
 
 ```
 cmake --build . --config Release
+```
+
+## Manually building your addon
+
+If you prefer to create your own executable or addon manually, then once you have included `idasdk.cmake`, you get these variables you can use:
+
+- IDALIBPATH: Points to the IDA shared library path (ida.lib, etc.)
+- IDALIBSUFFIX: Contains the IDA shared library suffix (win32: .lib, linux: .so, mac: .dylib)
+- IDASLIBPATH: Points to the IDA static library path (pro.lib, etc.)
+- IDALIB: Points to the IDA shared library (ida.lib, etc.)
+- IDAPROLIB: Points to the IDA static library (pro.lib, etc.)
+- IDAPROINCLUDE: Points to the IDA SDK include path
+- IDAPROPLAT: Contains the IDA SDK platform (win32: __NT__, linux: __LINUX__, mac: __MAC__)
+
+Then you can just create an addon as such:
+
+```cmake
+add_library(myplugin SHARED plugin1.cpp)
+target_link_libraries(myplugin PRIVATE ${IDALIB})
+target_include_directories(myplugin PRIVATE ${IDAPROINCLUDE})
+target_compile_definitions(myplugin PRIVATE ${IDAPROPLAT}=1)
 ```
