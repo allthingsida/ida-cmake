@@ -237,3 +237,24 @@ or:
 ```
 cmake --build . --config Release
 ```
+
+## Manually building your addon
+
+If you prefer to create your own executable or addon manually, then once you have included `common.cmake`, you get these variables you can use:
+
+- IDALIBPATH: Points to the IDA shared library path (ida.lib, etc.)
+- IDALIBSUFFIX: Contains the IDA shared library suffix (win32: .lib, linux: .so, mac: .dylib)
+- IDASLIBPATH: Points to the IDA static library path (pro.lib, etc.)
+- IDALIB: Points to the IDA shared library (ida.lib, etc.)
+- IDAPROLIB: Points to the IDA static library (pro.lib, etc.)
+- IDAPROINCLUDE: Points to the IDA SDK include path
+- IDAPROPLAT: Contains the IDA SDK platform (win32: __NT__, linux: __LINUX__, mac: __MAC__)
+
+Then you can just create an addon as such:
+
+```cmake
+add_library(myplugin SHARED plugin1.cpp)
+target_link_libraries(myplugin PRIVATE ${IDALIB})
+target_include_directories(myplugin PRIVATE ${IDAPROINCLUDE})
+target_compile_definitions(myplugin PRIVATE ${IDAPROPLAT}=1)
+```
