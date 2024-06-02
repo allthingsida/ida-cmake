@@ -249,6 +249,7 @@ If you prefer to create your own executable or addon manually, then once you hav
 - IDAPROLIB: Points to the IDA static library (pro.lib, etc.)
 - IDAPROINCLUDE: Points to the IDA SDK include path
 - IDAPROPLAT: Contains the IDA SDK platform (win32: __NT__, linux: __LINUX__, mac: __MAC__)
+- IDAEA64: Defines "__EA64__=1" or not
 
 Then you can just create an addon as such:
 
@@ -256,5 +257,5 @@ Then you can just create an addon as such:
 add_library(myplugin SHARED plugin1.cpp)
 target_link_libraries(myplugin PRIVATE ${IDALIB})
 target_include_directories(myplugin PRIVATE ${IDAPROINCLUDE})
-target_compile_definitions(myplugin PRIVATE ${IDAPROPLAT}=1)
+target_compile_definitions(myplugin PRIVATE ${IDAPROPLAT}=1 ${IDAEA64})
 ```
