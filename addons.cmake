@@ -101,6 +101,14 @@ else()
     set_target_properties(${ADDON_NAME} PROPERTIES OUTPUT_NAME ${ADDON_OUTPUT_NAME})
 endif() 
 
+# Look for libida one directory up relative to plugin folder, just like official Hex-Rays plugins on Linux
+if(DEFINED __LINUX__)
+    set_target_properties(${ADDON_NAME} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH true
+        INSTALL_RPATH "$ORIGIN/.."
+        LINK_OPTIONS "-Wl,--disable-new-dtags")
+endif()
+
 # Set include directory
 target_include_directories(${ADDON_NAME} PRIVATE ${IDASDK}/include ${ADDON_INCLUDE_DIRECTORIES})
 
