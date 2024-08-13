@@ -118,7 +118,7 @@ target_compile_definitions(${ADDON_NAME} PRIVATE __IDP__ MAXSTR=${MAXSTR})
 # Adjust output folders
 if (DEFINED __NT__)
     # On Windows and for release builds, statically link
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+    set_target_properties(${ADDON_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>")
 
     # Set the destination folder to be in IDA's binary output folder
     foreach (cfg IN LISTS CMAKE_CONFIGURATION_TYPES)
