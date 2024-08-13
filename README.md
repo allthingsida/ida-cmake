@@ -72,7 +72,7 @@ In the following subsections, we describe how to configure `ida-cmake` for _plug
 To get started, simply copy the desired template plugin CMake build [script](plugins/sample/CMakeLists.txt) from the [plugins/](plugins/) samples to your plugin source directory and edit it accordingly:
 
 ```cmake
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 project(MyPluginProjectName)
 
@@ -107,7 +107,7 @@ To do that, check the [ida-cmake/plugins/twoplugins](plugins/twoplugins) folder.
 In essence, all you have to do is something like the following:
 
 ```cmake
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 project(TwoPlugins)
 
@@ -165,7 +165,7 @@ In the build folders, if the Visual Studio generator was used, then you will hav
 To configure CMake for multiple addons existing in their own folders, just create a `CMakeLists.txt` file that includes the directories of the addons in question:
 
 ```cmake
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 project(AllPlugins)
 
@@ -206,7 +206,7 @@ cmake .. -DIDASDK=</path/to/idasdk> -DIDABIN="%APPDATA%\Hex-Rays\IDA Pro"
 For this to work, your CMake build script should be able to include the needed bootstrap CMake script correctly (note the `include`):
 
 ```cmake
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 project(mysample)
 
