@@ -119,6 +119,8 @@ target_compile_definitions(${ADDON_NAME} PRIVATE __IDP__ MAXSTR=${MAXSTR})
 if (DEFINED __NT__)
     # On Windows and for release builds, statically link
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+    # That's a Windows subsystem plugin (not Console)
+    set_property(TARGET ${ADDON_NAME} APPEND_STRING PROPERTY LINK_FLAGS " /SUBSYSTEM:WINDOWS")
 
     # Set the destination folder to be in IDA's binary output folder
     foreach (cfg IN LISTS CMAKE_CONFIGURATION_TYPES)
