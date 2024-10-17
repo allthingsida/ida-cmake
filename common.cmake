@@ -1,7 +1,7 @@
 include_guard(DIRECTORY)
 
 # Specify the addressing mode for the addons
-set(EA64   OFF  CACHE BOOL     "64-bits addressing")
+set(EA64   ON  CACHE BOOL     "64-bits addressing")
 
 # Specify the default MAXSTR string buffer size (obsolete)
 set(MAXSTR 1024 CACHE STRING   "MAXSTR value")
@@ -34,17 +34,7 @@ else()
     message("-- Setting default IDABIN folder to: ${IDABIN}")
 endif()
 
-# Detect the Pro SDK edition (using folder names). We can also check 'defaults.mk'/NOTEAMS=1, etc.
-# (The _pro suffix is new since SDK 8.2sp1 pro edition. The Teams SDK does not seem to use any suffix)
-file(GLOB FOLDERS "${IDASDK}/lib/*")
-foreach (folder ${FOLDERS})
-    if (folder MATCHES ".*_pro$")
-        set(IDALIBPATHSUFFIX "_pro")
-        break()
-    endif()
-endforeach()
-
-# Parse SDK version
+# Parse the SDK version
 file(READ "${IDASDK_PRO_H}" IDASDK_PRO_H_CONTENT)
 string(REGEX MATCH "IDA_SDK_VERSION *([0-9]+)" IDASDK_VERSION "${IDASDK_PRO_H_CONTENT}")
 set(IDASDK_VERSION ${CMAKE_MATCH_1})
@@ -62,45 +52,45 @@ if (WIN32 AND MSVC)
 
     set(IDALIBSUFFIX "lib")
 
-    set(IDALIBPATH32  "${IDASDK}/lib/x64_win_vc_32${IDALIBPATHSUFFIX}")
-    set(IDALIBPATH64  "${IDASDK}/lib/x64_win_vc_64${IDALIBPATHSUFFIX}")
-    set(IDASLIBPATH32 "${IDASDK}/lib/x86_win_vc_32${IDALIBPATHSUFFIX}_s")
-    set(IDASLIBPATH64 "${IDASDK}/lib/x64_win_vc_64${IDALIBPATHSUFFIX}_s")
+    set(IDALIBPATH32  "${IDASDK}/lib/x64_win_vc_32")
+    set(IDALIBPATH64  "${IDASDK}/lib/x64_win_vc_64")
+    # Static libraries
+    set(IDASLIBPATH32 "${IDASDK}/lib/x86_win_vc_32_s")
+    set(IDASLIBPATH64 "${IDASDK}/lib/x64_win_vc_64_s")
 
     set(IDALIB32 ${IDALIBPATH32}/ida.lib)
     set(IDALIB64 ${IDALIBPATH64}/ida.lib)
-    if (${EA64})
-        set(IDAEXE ida64.exe)
-    else()
-        set(IDAEXE ida.exe)
-    endif()
-elseif(APPLE)
+    set(IDALIBLIB64 ${IDALIBPATH64}/idalib.lib)
+    set(IDAEXE ida.exe)
+    elseif(APPLE)
     set(__MAC__ 1)
     set(IDAPROPLAT "__MAC__")
-
+    
     set(IDALIBSUFFIX "dylib")
-
+    
     if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
-        set(IDALIBPATH32 "${IDASDK}/lib/arm64_mac_clang_32${IDALIBPATHSUFFIX}")
-        set(IDALIBPATH64 "${IDASDK}/lib/arm64_mac_clang_64${IDALIBPATHSUFFIX}")
+        set(IDALIBPATH32 "${IDASDK}/lib/arm64_mac_clang_32")
+        set(IDALIBPATH64 "${IDASDK}/lib/arm64_mac_clang_64")
     else()
-        set(IDALIBPATH32 "${IDASDK}/lib/x64_mac_clang_32${IDALIBPATHSUFFIX}")
-        set(IDALIBPATH64 "${IDASDK}/lib/x64_mac_clang_64${IDALIBPATHSUFFIX}")
+        set(IDALIBPATH32 "${IDASDK}/lib/x64_mac_clang_32")
+        set(IDALIBPATH64 "${IDASDK}/lib/x64_mac_clang_64")
     endif()
-    set(IDALIB32 ${IDALIBPATH32}/libida.dylib)
-    set(IDALIB64 ${IDALIBPATH64}/libida64.dylib)
-elseif(UNIX AND NOT APPLE)
+        set(IDALIB32 ${IDALIBPATH32}/libida.dylib)
+        set(IDALIB64 ${IDALIBPATH64}/libida64.dylib)
+        set(IDALIBLIB64 ${IDALIBPATH64}/libidalib.dylib)
+    elseif(UNIX AND NOT APPLE)
     set(__LINUX__ 1)
     set(IDAPROPLAT "__LINUX__")
-
+    
     set(IDALIBSUFFIX "so")
-
-    set(IDALIBPATH32  "${IDASDK}/lib/x64_linux_gcc_32${IDALIBPATHSUFFIX}")
-    set(IDALIBPATH64  "${IDASDK}/lib/x64_linux_gcc_64${IDALIBPATHSUFFIX}")
+    
+    set(IDALIBPATH32  "${IDASDK}/lib/x64_linux_gcc_32")
+    set(IDALIBPATH64  "${IDASDK}/lib/x64_linux_gcc_64")
     set(IDASLIBPATH64 "${IDALIBPATH64}")
-
+    
     set(IDALIB32 ${IDALIBPATH32}/libida.so)
     set(IDALIB64 ${IDALIBPATH64}/libida64.so)
+    set(IDALIBLIB64 ${IDALIBPATH64}/libidalib.so)
 else()
     message(FATAL_ERROR "Unknown platform!")
 endif()
@@ -110,6 +100,7 @@ if (${EA64})
     set(IDALIBPATH  "${IDALIBPATH64}")
     set(IDASLIBPATH "${IDASLIBPATH64}")
     set(IDALIB      "${IDALIB64}")
+    set(IDALIBLIB   "${IDALIBLIB64}")
 else()
     set(IDALIBPATH  "${IDALIBPATH32}")
     set(IDASLIBPATH "${IDASLIBPATH32}")

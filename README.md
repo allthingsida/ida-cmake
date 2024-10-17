@@ -1,8 +1,8 @@
 # Introduction
 
-`ida-cmake` provides a convenience CMake build script template for compiling IDA addons on Windows, Linux and macOS (Intel or Apple Silicon). It requires very minimal set up and little to zero knowledge of the IDA SDK build system and how to configure it (especially on MS Windows, which can be very tedious).
+>*`ida-cmake` for IDA 9 and onwards.* For older IDA versions, please check the [8.x](https://github.com/allthingsida/ida-cmake/tree/8.x) branch.
 
->*`ida-cmake` has been tested with the IDA SDK 7.2 and onwards.*
+`ida-cmake` provides a convenience CMake build script template for compiling IDA addons on Windows, Linux and macOS (Intel or Apple Silicon). It requires very minimal set up and little to zero knowledge of the IDA SDK build system and how to configure it (especially on MS Windows, which can be very tedious).
 
 # Quick Start Guide
 
@@ -246,6 +246,7 @@ If you prefer to create your own executable or addon manually, then once you hav
 - IDALIBSUFFIX: Contains the IDA shared library suffix (win32: .lib, linux: .so, mac: .dylib)
 - IDASLIBPATH: Points to the IDA static library path (pro.lib, etc.)
 - IDALIB: Points to the IDA shared library (ida.lib, etc.)
+- IDALIBLIB: Points to the IDA as Library shared library (idalib.lib, etc.)
 - IDAPROLIB: Points to the IDA static library (pro.lib, etc.)
 - IDAPROINCLUDE: Points to the IDA SDK include path
 - IDAPROPLAT: Contains the IDA SDK platform (win32: __NT__, linux: __LINUX__, mac: __MAC__)
@@ -259,3 +260,28 @@ target_link_libraries(myplugin PRIVATE ${IDALIB})
 target_include_directories(myplugin PRIVATE ${IDAPROINCLUDE})
 target_compile_definitions(myplugin PRIVATE ${IDAPROPLAT}=1 ${IDAEA64})
 ```
+
+## IDA as a Library
+
+To use IDA as a library, just compose your CMake project and use the CMake variables (described above; mainly `IDAPROINCLUDE`, `IDALIB` and `IDALIBLIB`) to link against the IDALIB shared library.
+
+Here's an example CMake build script:
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+
+project(myidalib VERSION 1.0)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+include($ENV{IDASDK}/ida-cmake/idasdk.cmake)
+
+# Add the executable
+add_executable(myidalib main.cpp)
+target_link_libraries(myidalib PRIVATE ${IDALIBLIB} ${IDALIB})
+target_include_directories(myidalib PRIVATE ${IDAPROINCLUDE})
+target_compile_definitions(myidalib PRIVATE ${IDAPROPLAT}=1 ${IDAEA64})
+```
+
+Please check the [idalib](idalib) sample for more details.

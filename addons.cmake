@@ -94,11 +94,11 @@ endif()
 if (${EA64})
     target_compile_definitions(${ADDON_NAME} PRIVATE __EA64__=1)
     target_link_libraries(${ADDON_NAME} ${IDALIB64} ${ADDON_LINK_LIBRARIES})
-    set_target_properties(${ADDON_NAME} PROPERTIES OUTPUT_NAME ${ADDON_OUTPUT_NAME}64)
+    set_target_properties(${ADDON_NAME} PROPERTIES OUTPUT_NAME ${ADDON_OUTPUT_NAME})
 else()
     # Use x64 IDA 32bits addressing
     target_link_libraries(${ADDON_NAME} ${IDALIB32} ${ADDON_LINK_LIBRARIES})
-    set_target_properties(${ADDON_NAME} PROPERTIES OUTPUT_NAME ${ADDON_OUTPUT_NAME})
+    set_target_properties(${ADDON_NAME} PROPERTIES OUTPUT_NAME ${ADDON_OUTPUT_NAME}32)
 endif() 
 
 # Look for libida one directory up relative to plugin folder, just like official Hex-Rays plugins on Linux
@@ -138,8 +138,8 @@ else()
     set_target_properties(${ADDON_NAME} PROPERTIES PREFIX "")
 endif()
 
+# Set convenience user debugging information for MSVC projects
 if (DEFINED IS_PLUGIN)
-    # Set convenience user debugging information for MSVC projects
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         configure_file(
             "${CMAKE_CURRENT_LIST_DIR}/plugins.vcxproj.user" 
@@ -147,7 +147,6 @@ if (DEFINED IS_PLUGIN)
             @ONLY)
     endif()
 elseif(DEFINED IS_LOADER)
-    # Set convenience user debugging information for MSVC projects
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         configure_file(
             "${CMAKE_CURRENT_LIST_DIR}/loaders.vcxproj.user" 
@@ -155,7 +154,6 @@ elseif(DEFINED IS_LOADER)
             @ONLY)
     endif()
 elseif(DEFINED IS_PROCMOD)
-    # Set convenience user debugging information for MSVC projects
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         configure_file(
             "${CMAKE_CURRENT_LIST_DIR}/procmod.vcxproj.user" 
