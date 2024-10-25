@@ -89,7 +89,7 @@ elseif(UNIX AND NOT APPLE)
     set(IDASLIBPATH64 "${IDALIBPATH64}")
     
     set(IDALIB32 ${IDALIBPATH32}/libida.so)
-    set(IDALIB64 ${IDALIBPATH64}/libida64.so)
+    set(IDALIB64 ${IDALIBPATH64}/libida.so)
     set(IDALIBLIB64 ${IDALIBPATH64}/libidalib.so)
 else()
     message(FATAL_ERROR "Unknown platform!")
