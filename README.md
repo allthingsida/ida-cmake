@@ -2,7 +2,7 @@
 
 `ida-cmake` provides a convenience CMake build script template for compiling IDA addons on Windows, Linux and macOS (Intel or Apple Silicon). It requires very minimal set up and little to zero knowledge of the IDA SDK build system and how to configure it (especially on MS Windows, which can be very tedious).
 
->*`ida-cmake` has been tested with the IDA SDK 7.2 and onwards.*
+>*`ida-cmake` has been tested with IDA SDK 7.2 and works up to IDA SDK 8.4.* For IDA 8.5 and above, please check the main branch.*
 
 # Quick Start Guide
 
@@ -34,7 +34,7 @@ Alternatively, if you have multiple IDA SDKs installed, it does not make sense t
 For example, on Windows:
 
 ```batch
-mklink /j c:\idasdk82\ida-cmake c:\projects\ida-cmake
+mklink /j c:\idasdk84\ida-cmake c:\projects\ida-cmake
 mklink /j c:\idasdk80\ida-cmake c:\projects\ida-cmake
 ```
 
