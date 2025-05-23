@@ -67,8 +67,8 @@ elseif(APPLE)
     set(IDAPROPLAT "__MAC__")
     
     set(IDALIBSUFFIX "dylib")
-    
-    if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
+
+    if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
         set(IDALIBPATH32 "${IDASDK}/lib/arm64_mac_clang_32")
         set(IDALIBPATH64 "${IDASDK}/lib/arm64_mac_clang_64")
     else()
