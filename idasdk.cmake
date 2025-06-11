@@ -1,5 +1,10 @@
 include_guard(DIRECTORY)
-if (DEFINED IDASDK)
+
+if (DEFINED IDACMAKE)
+    include(${IDACMAKE}/common.cmake)
+elseif  (DEFINED ENV{IDACMAKE})
+    include($ENV{IDACMAKE}/common.cmake)
+elseif (DEFINED IDASDK)
     include(${IDASDK}/ida-cmake/common.cmake)
 elseif (DEFINED ENV{IDASDK})
     include($ENV{IDASDK}/ida-cmake/common.cmake)

@@ -114,7 +114,11 @@ set(IDAPROINCLUDE "${IDASDK}/include")
 # Convenience macro to include the addons script and create the proper targets
 # The addons script can be included many times, each time it generates a new target
 macro(generate)
-    if (DEFINED IDASDK)
+    if (DEFINED IDACMAKE)
+        include(${IDACMAKE}/addons.cmake)
+    elseif  (DEFINED ENV{IDACMAKE})
+        include($ENV{IDACMAKE}/addons.cmake)
+    elseif (DEFINED IDASDK)
         include(${IDASDK}/ida-cmake/addons.cmake)
     elseif (DEFINED ENV{IDASDK})
         include($ENV{IDASDK}/ida-cmake/addons.cmake)
