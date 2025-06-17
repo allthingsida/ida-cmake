@@ -46,7 +46,7 @@ endif()
 message("-- Detected IDA SDK version: ${IDASDK_VERSION}")
 
 # Set libraries path
-if (WIN32 AND MSVC)
+if (WIN32)
     set(__NT__ 1)
     set(IDAPROPLAT   "__NT__")
 
