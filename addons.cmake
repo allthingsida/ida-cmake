@@ -131,7 +131,7 @@ if (DEFINED __NT__)
     foreach (cfg IN LISTS CMAKE_CONFIGURATION_TYPES)
         string(TOUPPER ${cfg} cfg)
         set_target_properties(${ADDON_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_${cfg} ${IDABIN}/${ADDON_BIN})
-        set_target_properties(${ADDON_NAME} PROPERTIES PREFIX_${cfg} ""})
+        set_target_properties(${ADDON_NAME} PROPERTIES PREFIX_${cfg} "")
     endforeach()
 
     set_target_properties(${ADDON_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${IDABIN}/${ADDON_BIN})
