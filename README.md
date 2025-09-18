@@ -1,6 +1,6 @@
 # Introduction
 
->*`ida-cmake` for IDA 8.x, 9.x and onwards.* For IDA versions 8.4 and below, please check the [8.x](https://github.com/allthingsida/ida-cmake/tree/8.x) branch.
+>*`ida-cmake` for IDA 8.x to 9.1 and onwards.* For IDA versions 8.4 and below, please check the [8.x](https://github.com/allthingsida/ida-cmake/tree/8.x) branch.
 
 `ida-cmake` provides a convenience CMake build script template for compiling IDA addons on Windows, Linux and macOS (Intel or Apple Silicon). It requires very minimal set up and little to zero knowledge of the IDA SDK build system and how to configure it (especially on MS Windows, which can be very tedious).
 
