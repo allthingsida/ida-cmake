@@ -1,5 +1,5 @@
-build/
-build64/
+.DS_Store
+build*/
 .vs/
-.idea/
-cmake-build-*/
+.claude/settings.local.json
+templates/**/.vscode/
