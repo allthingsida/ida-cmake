@@ -74,23 +74,21 @@ if(NOT TARGET idasdk::procmod)
     target_link_libraries(idasdk::procmod INTERFACE idasdk::plugin)
 endif()
 
-# IDALib support (if requested)
-if("IDALib" IN_LIST idasdk_FIND_COMPONENTS)
-    if(NOT TARGET idasdk::idalib)
-        add_library(idasdk::idalib INTERFACE IMPORTED)
-        set_target_properties(idasdk::idalib PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES "${IDASDK}/include"
-            INTERFACE_COMPILE_DEFINITIONS "IDALIB_IMPL"
-        )
+# IDALib support
+if(NOT TARGET idasdk::idalib)
+    add_library(idasdk::idalib INTERFACE IMPORTED)
+    set_target_properties(idasdk::idalib PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${IDASDK}/include"
+        INTERFACE_COMPILE_DEFINITIONS "IDALIB_IMPL"
+    )
 
-        # Link to platform and compiler settings, plus BOTH idalib and ida libraries
-        # Note: idalib.lib requires ida.lib for some symbols
-        target_link_libraries(idasdk::idalib INTERFACE
-            ida_platform_settings
-            ida_compiler_settings
-            "${IDA_LIB_DIR}/${IDALIB_NAME}"
-            "${IDA_LIB_DIR}/${IDA_LIB_NAME}")
-    endif()
+    # Link to platform and compiler settings, plus BOTH idalib and ida libraries
+    # Note: idalib.lib requires ida.lib for some symbols
+    target_link_libraries(idasdk::idalib INTERFACE
+        ida_platform_settings
+        ida_compiler_settings
+        "${IDA_LIB_DIR}/${IDALIB_NAME}"
+        "${IDA_LIB_DIR}/${IDA_LIB_NAME}")
 endif()
 
 

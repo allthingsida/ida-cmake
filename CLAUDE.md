@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ida-cmake is a CMake build system for developing IDA Pro addons (plugins, loaders, processor modules, and IDALib applications) using the IDA SDK. It provides a clean interface library approach with automatic IDE configuration and cross-platform support.
+ida-cmake is a CMake build system for developing IDA Pro addons (plugins, loaders, processor modules, and idalib applications) using the IDA SDK. It provides a clean interface library approach with automatic IDE configuration and cross-platform support.
 
 ## Environment Setup
 
@@ -34,7 +34,7 @@ Use the provided CMake functions in any project's CMakeLists.txt:
 - `ida_add_plugin()` - Create IDA plugin
 - `ida_add_loader()` - Create file loader
 - `ida_add_procmod()` - Create processor module
-- `ida_add_idalib()` - Create standalone IDALib application
+- `ida_add_idalib()` - Create standalone idalib application
 
 ### Testing
 - Built addons are automatically deployed to `$IDABIN/plugins/`, `$IDABIN/loaders/`, or `$IDABIN/procs/`

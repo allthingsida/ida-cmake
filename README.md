@@ -102,7 +102,7 @@ ida_add_procmod(myproc
 Creates an executable using IDA as a library.
 
 ```cmake
-find_package(idasdk REQUIRED COMPONENTS IDALib)
+find_package(idasdk REQUIRED)
 
 ida_add_idalib_exe(myapp
     SOURCES main.cpp

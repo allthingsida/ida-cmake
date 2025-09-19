@@ -4,12 +4,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Include IDA SDK bootstrap
 include($ENV{IDASDK}/ida-cmake/bootstrap.cmake)
-find_package(idasdk REQUIRED COMPONENTS IDALib)
+find_package(idasdk REQUIRED)
 
 # Convert paths to native format
 set(SAMPLE_IDB "${IDA_CMAKE_DIR}/samples/wizmo32.exe.i64")
 file(TO_NATIVE_PATH "${SAMPLE_IDB}" SAMPLE_IDB)
-file(TO_NATIVE_PATH "${IDABIN}" IDABIN_NATIVE)
 
 # Add IDALib executable with sample IDB as debug argument
 ida_add_idalib_exe(myidalib
@@ -21,6 +20,7 @@ ida_add_idalib_exe(myidalib
 
 # idalib programs need to have IDA in the path folder
 if(MSVC)
+    file(TO_NATIVE_PATH "${IDABIN}" IDABIN_NATIVE)
     set_target_properties(myidalib PROPERTIES
         VS_DEBUGGER_ENVIRONMENT "PATH=${IDABIN_NATIVE};%PATH%"
     )

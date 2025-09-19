@@ -198,7 +198,7 @@ function(ida_add_procmod NAME)
     _ida_create_addon_internal(${NAME} "procmod" idasdk::procmod "${IDA_PROCMOD_DIR}" ${ARGN})
 endfunction()
 
-# Function to create an IDALib executable
+# Function to create an idalib executable
 function(ida_add_idalib_exe NAME)
     cmake_parse_arguments(ARG
         ""
@@ -210,11 +210,11 @@ function(ida_add_idalib_exe NAME)
     # Create the executable
     add_executable(${NAME} ${ARG_SOURCES})
 
-    # Link to base configuration and IDALib (order matters for property inheritance)
+    # Link to base configuration and idalib (order matters for property inheritance)
     target_link_libraries(${NAME}
         PRIVATE
             ida_addon_base      # Common properties (even though it's an exe, shares config)
-            idasdk::idalib      # IDALib target (includes platform/compiler settings)
+            idasdk::idalib      # idalib target (includes platform/compiler settings)
     )
 
     # Add user-specified libraries (after SDK to allow overrides)
