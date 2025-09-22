@@ -4,6 +4,17 @@ CMake build system for developing IDA Pro addons (plugins, loaders, processor mo
 
 >For IDA 9.1 and below, please check the [9.1](https://github.com/allthingsida/ida-cmake/tree/9.1) branch.
 
+## Two Ways to Use ida-cmake
+
+ida-cmake provides **two approaches** for building IDA addons:
+
+1. **Convenience Functions** (Recommended) - Simple one-liners like `ida_add_plugin()`
+2. **Standard CMake** - Traditional `add_library()`/`add_executable()` with the provided interface targets
+
+Both approaches are fully supported. Choose based on your preference!
+
+> This dual approach follows the same pattern used by major projects like Qt (`qt_add_executable()`), LLVM (`add_llvm_library()`), and CUDA (`cuda_add_library()`) - providing convenience functions while maintaining full standard CMake compatibility.
+
 ## Quick Start
 
 ### 1. Prerequisites
@@ -36,6 +47,8 @@ git clone https://github.com/allthingsida/ida-cmake.git $IDASDK/ida-cmake
 
 ### 3. Create Your First Plugin
 
+#### Option A: Using Convenience Functions (Recommended)
+
 Create a `CMakeLists.txt`:
 
 ```cmake
@@ -47,13 +60,25 @@ set(CMAKE_CXX_STANDARD 17)
 include($ENV{IDASDK}/ida-cmake/bootstrap.cmake)
 find_package(idasdk REQUIRED)
 
-# Add plugin
+# Add plugin with one simple function
 ida_add_plugin(myplugin
     SOURCES main.cpp
 )
 ```
 
-Build it:
+#### Option B: Using Standard CMake
+
+If you prefer vanilla CMake, use our interface targets directly. See [`templates/plugin-vanilla/`](templates/plugin-vanilla/) for a complete example:
+
+```cmake
+# Standard CMake approach
+add_library(myplugin SHARED main.cpp)
+target_link_libraries(myplugin PRIVATE idasdk::plugin)
+
+# Plus platform-specific settings (see template for details)
+```
+
+Build (same for both approaches):
 
 ```bash
 cmake -B build
@@ -99,25 +124,36 @@ ida_add_procmod(myproc
 ```
 
 #### `ida_add_idalib_exe(name ...)`
-Creates an executable using IDA as a library.
+Creates an executable using IDA as a library. For vanilla CMake approach, see [`templates/idalib-vanilla/`](templates/idalib-vanilla/).
 
 ```cmake
-find_package(idasdk REQUIRED)
-
 ida_add_idalib_exe(myapp
     SOURCES main.cpp
 )
 ```
 
+## Interface Targets (For Standard CMake Users)
+
+If you prefer standard CMake commands, ida-cmake provides interface targets:
+
+- **`idasdk::plugin`** - For IDA plugins
+- **`idasdk::loader`** - For file loaders
+- **`idasdk::procmod`** - For processor modules
+- **`idasdk::idalib`** - For standalone idalib applications
+
+These targets automatically handle all SDK configuration (includes, defines, libraries, platform settings) through CMake's transitive properties. See [`templates/plugin-vanilla/`](templates/plugin-vanilla/) for a complete working example.
+
 ## Project Templates
 
 Ready-to-use templates are available in `$IDASDK/ida-cmake/templates/`:
 
-- `plugin/` - Basic plugin template
+- `plugin/` - Basic plugin template (convenience functions)
+- `plugin-vanilla/` - Plugin using standard CMake commands
 - `plugin-no-bootstrap/` - Plugin using CMAKE_PREFIX_PATH approach (no bootstrap include)
 - `loader/` - File loader template
 - `procmod/` - Processor module template
-- `idalib/` - IDA as library template
+- `idalib/` - IDA as library template (convenience functions)
+- `idalib-vanilla/` - IDALib using standard CMake commands
 
 Copy a template to start your project:
 
@@ -165,6 +201,8 @@ find_package(idasdk REQUIRED)
 ida_add_plugin(plugin1 SOURCES plugin1.cpp)
 ida_add_plugin(plugin2 SOURCES plugin2.cpp)
 ```
+
+For the standard CMake approach, see [`templates/plugin-vanilla/`](templates/plugin-vanilla/).
 
 ### Using External Libraries
 
