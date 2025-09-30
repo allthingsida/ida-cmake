@@ -64,5 +64,8 @@ if(NOT TARGET install_idacmake_agent)
         VERBATIM
     )
 
-    message(STATUS "To install the ida-cmake build agent, run: cmake --build build --target install_idacmake_agent")
+    # Only show installation message if agent is not already installed
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.claude/agents/ida-cmake.md")
+        message(STATUS "To install the ida-cmake build agent, run: cmake --build build --target install_idacmake_agent")
+    endif()
 endif()
