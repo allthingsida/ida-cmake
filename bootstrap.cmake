@@ -11,9 +11,20 @@ if(NOT EXISTS "$ENV{IDASDK}")
     message(FATAL_ERROR "IDASDK path does not exist: $ENV{IDASDK}")
 endif()
 
-if(NOT EXISTS "$ENV{IDASDK}/include/pro.h")
-    message(FATAL_ERROR "Invalid IDASDK directory (missing include/pro.h): $ENV{IDASDK}")
+# Auto-detect SDK structure: GitHub clone has files under src/, zip distribution at root
+set(_IDASDK_ACTUAL "$ENV{IDASDK}")
+if(NOT EXISTS "${_IDASDK_ACTUAL}/include/pro.h")
+    # Check if this is a GitHub clone with src/ subdirectory
+    if(EXISTS "${_IDASDK_ACTUAL}/src/include/pro.h")
+        set(_IDASDK_ACTUAL "${_IDASDK_ACTUAL}/src")
+        message(STATUS "Detected GitHub SDK structure, using: ${_IDASDK_ACTUAL}")
+    else()
+        message(FATAL_ERROR "Invalid IDASDK directory (missing include/pro.h): $ENV{IDASDK}")
+    endif()
 endif()
+
+# Override IDASDK environment variable for this CMake run with the adjusted path
+set(ENV{IDASDK} "${_IDASDK_ACTUAL}")
 
 # Add ida-cmake to the package search path
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR})
