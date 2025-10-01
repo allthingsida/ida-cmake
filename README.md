@@ -143,6 +143,25 @@ If you prefer standard CMake commands, ida-cmake provides interface targets:
 
 These targets automatically handle all SDK configuration (includes, defines, libraries, platform settings) through CMake's transitive properties. See [`templates/plugin-vanilla/`](templates/plugin-vanilla/) for a complete working example.
 
+## Configuration Options
+
+ida-cmake provides several CMake options to customize the build:
+
+### `IDACMAKE_ENABLE_DEBUGGER`
+
+Enable debugger module support targets (disabled by default).
+
+```bash
+cmake -B build -DIDACMAKE_ENABLE_DEBUGGER=ON
+```
+
+When enabled, provides these additional targets for building custom debugger plugins:
+- **`idasdk::dbg`** - Base debugger module support
+- **`idasdk::dbg::pc`** - PC architecture debugger support
+- **`idasdk::dbg::arm`** - ARM architecture debugger support
+
+Most users don't need these targets unless developing custom debugger plugins.
+
 ## Project Templates
 
 Ready-to-use templates are available in `$IDASDK/ida-cmake/templates/`:
