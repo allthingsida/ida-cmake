@@ -206,6 +206,36 @@ The agent provides expertise in:
 - IDA SDK API usage and examples
 - Debugging setup for VS Code and Visual Studio
 
+## Platform-Specific Notes
+
+### macOS Universal Binaries
+
+macOS universal binaries (combining arm64 and x86_64) are **fully supported** via automatic library merging with `lipo`.
+
+**How it works:** When you set `CMAKE_OSX_ARCHITECTURES` to multiple architectures, ida-cmake automatically:
+1. Detects architecture-specific IDA SDK libraries
+2. Merges them into universal libraries using `lipo` at configure time
+3. Links your addon against the merged universal libraries
+
+**Usage:**
+
+```bash
+# Build universal binary (single command!)
+cmake -B build -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+cmake --build build --config Release
+
+# Verify the output is universal
+lipo -info build/myplugin.dylib
+# Should show: Architectures in the fat file: myplugin.dylib are: x86_64 arm64
+```
+
+**Single-architecture builds:** Either omit `CMAKE_OSX_ARCHITECTURES` (auto-detects host) or specify one architecture:
+```bash
+cmake -B build -DCMAKE_OSX_ARCHITECTURES=arm64  # or x86_64
+```
+
+**Technical details:** The IDA SDK provides architecture-specific libraries (`lib/arm64_mac_clang_64/libida.dylib` and `lib/x64_mac_clang_64/libida.dylib`). ida-cmake uses `lipo` to merge these into universal libraries stored in `build/ida-universal-libs/`, which are then linked to your addon.
+
 ## Examples
 
 ### Multiple Plugins in One Project

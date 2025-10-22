@@ -29,13 +29,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(IDA_PLATFORM_NAME "mac")
     set(IDAPROPLAT "__MAC__")
 
-    # Detect architecture (Apple Silicon vs Intel)
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
-        set(IDA_ARCH "arm64")
-    else()
-        set(IDA_ARCH "x64")
-    endif()
-
     # Compiler detection for macOS
     if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(IDA_COMPILER "clang")
@@ -47,6 +40,39 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # Set deployment target
     if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
         set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+    endif()
+
+    # Handle universal binary builds (multiple architectures)
+    if(CMAKE_OSX_ARCHITECTURES)
+        list(LENGTH CMAKE_OSX_ARCHITECTURES _arch_count)
+        if(_arch_count GREATER 1)
+            # Universal binary build - need to merge libraries with lipo
+            set(IDA_UNIVERSAL_BINARY TRUE)
+            message(STATUS "Building macOS universal binary for architectures: ${CMAKE_OSX_ARCHITECTURES}")
+
+            # We'll set IDA_ARCH to a placeholder since we have multiple
+            # The actual library paths will be handled in idasdkConfig.cmake
+            set(IDA_ARCH "universal")
+        else()
+            # Single architecture from CMAKE_OSX_ARCHITECTURES
+            set(IDA_UNIVERSAL_BINARY FALSE)
+            list(GET CMAKE_OSX_ARCHITECTURES 0 _cmake_arch)
+            if(_cmake_arch STREQUAL "arm64")
+                set(IDA_ARCH "arm64")
+            elseif(_cmake_arch MATCHES "x86_64|i386")
+                set(IDA_ARCH "x64")
+            else()
+                message(FATAL_ERROR "Unsupported macOS architecture: ${_cmake_arch}")
+            endif()
+        endif()
+    else()
+        # Detect architecture from host system
+        set(IDA_UNIVERSAL_BINARY FALSE)
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
+            set(IDA_ARCH "arm64")
+        else()
+            set(IDA_ARCH "x64")
+        endif()
     endif()
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")

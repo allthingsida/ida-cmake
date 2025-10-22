@@ -76,3 +76,15 @@ Templates are provided in `/templates/` for each addon type with working example
 - All platforms build with EA64 (64-bit addressing)
 - Compiler warnings from IDA SDK headers are automatically suppressed
 - Debug builds include sanitizers and enhanced debugging on supported platforms
+
+### macOS Universal Binary Support
+
+**Universal binaries are fully supported!** When `CMAKE_OSX_ARCHITECTURES` contains multiple architectures (e.g., `arm64;x86_64`), ida-cmake automatically merges the architecture-specific IDA SDK libraries using `lipo` at configure time.
+
+**Usage:**
+```bash
+cmake -B build -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+cmake --build build --config Release
+```
+
+The merged universal libraries are created in `build/ida-universal-libs/` and automatically linked to your addon. No manual `lipo` steps needed!
