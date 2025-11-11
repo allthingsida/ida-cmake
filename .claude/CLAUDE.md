@@ -32,6 +32,7 @@ cmake --build build
 ### Creating New Addons
 Use the provided CMake functions in any project's CMakeLists.txt:
 - `ida_add_plugin()` - Create IDA plugin
+  - Supports optional `METADATA_JSON` parameter for IDA 9.x plugin metadata deployment
 - `ida_add_loader()` - Create file loader
 - `ida_add_procmod()` - Create processor module
 - `ida_add_idalib()` - Create standalone idalib application

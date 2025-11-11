@@ -1,0 +1,12 @@
+{
+  "IDAMetadataDescriptorVersion": 1,
+  "plugin": {
+    "name": "Sample Plugin",
+    "entryPoint": "myplugin",
+    "categories": ["collaboration-and-productivity"],
+    "logoPath": "logo.png",
+    "idaVersions": ">=9.0",
+    "description": "Sample plugin built with ida-cmake",
+    "version": "1.0.0"
+  }
+}

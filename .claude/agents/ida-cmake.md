@@ -50,6 +50,51 @@ ida_add_plugin(myplugin
         "-t -z10000"
 )```
 
+
+### IDA 9.x Plugin Metadata (Optional)
+
+Starting with IDA Pro 9.0, plugins can be deployed with metadata in subfolders using `ida-plugin.json` files.
+
+**Usage:**
+```cmake
+ida_add_plugin(myplugin
+    SOURCES
+        main.cpp
+    DEBUG_ARGS
+        "-t -z10000"
+    METADATA_JSON
+        ida-plugin.json  # Optional: enables metadata deployment
+)
+```
+
+
+**Metadata format** (`ida-plugin.json`):
+- **Required:** IDAMetadataDescriptorVersion, name, entryPoint, categories, description, version
+- **Optional:** logoPath, idaVersions
+- See README.md "IDA 9.x Plugin Metadata" section or [Hex-Rays docs](https://docs.hex-rays.com/user-guide/plugins/plugin-submission-guide) for complete specification
+
+**Deployment behavior:**
+- Without metadata: `$IDABIN/plugins/myplugin.dll` (traditional)
+- With metadata: `$IDABIN/plugins/myplugin/myplugin.dll` + `ida-plugin.json` (subfolder)
+
+**Auto-generation:** If the specified METADATA_JSON file doesn't exist, ida-cmake automatically generates a template with the plugin name pre-filled. The user can then customize it.
+
+**Example metadata file:**
+```json
+{
+  "IDAMetadataDescriptorVersion": 1,
+  "plugin": {
+    "name": "My Plugin",
+    "entryPoint": "myplugin",
+    "categories": ["collaboration-and-productivity"],
+    "logoPath": "logo.png",
+    "idaVersions": ">=9.0",
+    "description": "Brief description of your plugin's functionality",
+    "version": "1.0.0"
+  }
+}
+```
+
 ...and for a file loader, use the `ida_add_loader` function:
 
 ```cmake

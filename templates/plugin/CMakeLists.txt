@@ -17,3 +17,13 @@ ida_add_plugin(myplugin
     DEBUG_ARGS
         "${SAMPLE_IDB}"
 )
+# IDA 9.x deployment with metadata (uncomment to use)
+# Plugin deploys to: $IDABIN/plugins/myplugin/ with ida-plugin.json
+# ida_add_plugin(myplugin
+#     SOURCES
+#         main.cpp
+#     DEBUG_ARGS
+#         "${SAMPLE_IDB}"
+#     METADATA_JSON
+#         ida-plugin.json
+# )

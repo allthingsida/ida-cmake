@@ -132,6 +132,105 @@ ida_add_idalib_exe(myapp
 )
 ```
 
+## IDA 9.x Plugin Metadata
+
+IDA Pro 9.0+ supports organizing plugins in subfolders with `ida-plugin.json` metadata files. This feature is **optional** and **opt-in**.
+
+### Using Metadata (Optional)
+
+To deploy a plugin with metadata:
+
+**1. Create an `ida-plugin.json` file** in your project:
+
+```json
+{
+  "IDAMetadataDescriptorVersion": 1,
+  "plugin": {
+    "name": "My Plugin",
+    "entryPoint": "myplugin",
+    "categories": ["collaboration-and-productivity"],
+    "logoPath": "logo.png",
+    "idaVersions": ">=9.0",
+    "description": "Brief description of your plugin's functionality",
+    "version": "1.0.0"
+  }
+}
+```
+
+**Required fields:** `IDAMetadataDescriptorVersion`, `name`, `entryPoint`, `categories`, `description`, `version`  
+**Optional fields:** `logoPath`, `idaVersions`
+
+**Available categories:**
+- `disassembly-and-processor-modules`
+- `file-parsers-and-loaders`
+- `decompilation`
+- `debugging-and-tracing`
+- `deobfuscation`
+- `collaboration-and-productivity`
+- `integration-with-third-parties-interoperability`
+- `api-scripting-and-automation`
+- `ui-ux-and-visualization`
+- `malware-analysis`
+- `vulnerability-research-and-exploit-development`
+- `other`
+
+**2. Specify the metadata file** in your CMakeLists.txt:
+
+```cmake
+ida_add_plugin(myplugin
+    SOURCES main.cpp
+    METADATA_JSON ida-plugin.json
+)
+```
+
+**3. Build normally.** Your plugin will deploy to `$IDABIN/plugins/myplugin/` with metadata.
+
+> **Note:** If the specified JSON file doesn't exist, ida-cmake will automatically generate a template for you to customize.
+
+### Deployment Structure
+
+**Without metadata (traditional - default):**
+```
+$IDABIN/plugins/myplugin.dll
+```
+
+**With metadata (IDA 9.x - opt-in):**
+```
+$IDABIN/plugins/myplugin/
+├── myplugin.dll
+└── ida-plugin.json
+```
+
+### Multi-Plugin Projects with Metadata
+
+Each plugin gets its own subfolder to avoid conflicts:
+
+```cmake
+ida_add_plugin(plugin1
+    SOURCES plugin1.cpp
+    METADATA_JSON plugin1-metadata.json
+)
+
+ida_add_plugin(plugin2
+    SOURCES plugin2.cpp
+    METADATA_JSON plugin2-metadata.json
+)
+```
+
+Deploys to:
+```
+$IDABIN/plugins/
+├── plugin1/
+│   ├── plugin1.dll
+│   └── ida-plugin.json
+└── plugin2/
+    ├── plugin2.dll
+    └── ida-plugin.json
+```
+
+See [Hex-Rays documentation](https://docs.hex-rays.com/user-guide/plugins/plugin-submission-guide) for the complete metadata format specification.
+
+
 ## Interface Targets (For Standard CMake Users)
 
 If you prefer standard CMake commands, ida-cmake provides interface targets:

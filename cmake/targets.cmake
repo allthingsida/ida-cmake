@@ -185,7 +185,87 @@ endfunction()
 
 # Public function to add an IDA plugin
 function(ida_add_plugin NAME)
-    _ida_create_addon_internal(${NAME} "plugin" idasdk::plugin "${IDA_PLUGIN_DIR}" ${ARGN})
+    # Parse arguments including METADATA_JSON and standard arguments
+    cmake_parse_arguments(PLUGIN
+        ""
+        "METADATA_JSON;OUTPUT_NAME;DEBUG_ARGS;DEBUG_PROGRAM;DEBUG_WORKING_DIR"
+        "SOURCES;LIBRARIES;INCLUDES;DEFINES"
+        ${ARGN}
+    )
+
+    # Determine output directory based on metadata presence
+    set(OUTPUT_DIR "${IDA_PLUGIN_DIR}")
+
+    if(PLUGIN_METADATA_JSON)
+        # Metadata deployment: plugin goes into subfolder
+        set(OUTPUT_DIR "${IDA_PLUGIN_DIR}/${NAME}")
+
+        # Handle absolute vs relative path
+        if(NOT IS_ABSOLUTE "${PLUGIN_METADATA_JSON}")
+            set(metadata_source "${CMAKE_CURRENT_SOURCE_DIR}/${PLUGIN_METADATA_JSON}")
+        else()
+            set(metadata_source "${PLUGIN_METADATA_JSON}")
+        endif()
+
+        # Check if file exists, generate template if missing
+        if(NOT EXISTS "${metadata_source}")
+            # Generate comprehensive template with all fields per Hex-Rays spec
+            file(WRITE "${metadata_source}" "{\n  \"IDAMetadataDescriptorVersion\": 1,\n  \"plugin\": {\n    \"name\": \"${NAME}\",\n    \"entryPoint\": \"${NAME}\",\n    \"categories\": [\"collaboration-and-productivity\"],\n    \"logoPath\": \"logo.png\",\n    \"idaVersions\": \">=9.0\",\n    \"description\": \"TODO: Add a brief description of your plugin's functionality\",\n    \"version\": \"1.0.0\"\n  }\n}\n")
+            message(STATUS "${NAME}: generated template metadata at ${metadata_source}")
+        endif()
+
+        message(STATUS "${NAME}: deploying with metadata to ${OUTPUT_DIR}")
+    endif()
+
+    # Reconstruct argument list without METADATA_JSON for internal function
+    set(INTERNAL_ARGS "")
+    if(PLUGIN_SOURCES)
+        list(APPEND INTERNAL_ARGS SOURCES ${PLUGIN_SOURCES})
+    endif()
+    if(PLUGIN_LIBRARIES)
+        list(APPEND INTERNAL_ARGS LIBRARIES ${PLUGIN_LIBRARIES})
+    endif()
+    if(PLUGIN_INCLUDES)
+        list(APPEND INTERNAL_ARGS INCLUDES ${PLUGIN_INCLUDES})
+    endif()
+    if(PLUGIN_DEFINES)
+        list(APPEND INTERNAL_ARGS DEFINES ${PLUGIN_DEFINES})
+    endif()
+    if(PLUGIN_OUTPUT_NAME)
+        list(APPEND INTERNAL_ARGS OUTPUT_NAME ${PLUGIN_OUTPUT_NAME})
+    endif()
+    if(PLUGIN_DEBUG_ARGS)
+        list(APPEND INTERNAL_ARGS DEBUG_ARGS ${PLUGIN_DEBUG_ARGS})
+    endif()
+    if(PLUGIN_DEBUG_PROGRAM)
+        list(APPEND INTERNAL_ARGS DEBUG_PROGRAM ${PLUGIN_DEBUG_PROGRAM})
+    endif()
+    if(PLUGIN_DEBUG_WORKING_DIR)
+        list(APPEND INTERNAL_ARGS DEBUG_WORKING_DIR ${PLUGIN_DEBUG_WORKING_DIR})
+    endif()
+
+    # Create the plugin using internal function
+    _ida_create_addon_internal(${NAME} "plugin" idasdk::plugin "${OUTPUT_DIR}" ${INTERNAL_ARGS})
+
+    # Post-build: Copy JSON file and flatten multi-config if metadata enabled
+    if(PLUGIN_METADATA_JSON)
+        # Flatten multi-config generators (remove Debug/Release subdirs)
+        foreach(config Debug Release RelWithDebInfo MinSizeRel)
+            string(TOUPPER ${config} config_upper)
+            set_target_properties(${NAME} PROPERTIES
+                LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${OUTPUT_DIR}"
+                RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${OUTPUT_DIR}"
+            )
+        endforeach()
+
+        # Copy JSON file to deployment location
+        add_custom_command(TARGET ${NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${metadata_source}"
+                "${OUTPUT_DIR}/ida-plugin.json"
+            COMMENT "Copying metadata for ${NAME}"
+        )
+    endif()
 endfunction()
 
 # Public function to add an IDA loader
