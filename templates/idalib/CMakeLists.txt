@@ -11,7 +11,8 @@ set(SAMPLE_IDB "${IDA_CMAKE_DIR}/samples/wizmo32.exe.i64")
 file(TO_NATIVE_PATH "${SAMPLE_IDB}" SAMPLE_IDB)
 
 # Add IDALib executable with sample IDB as debug argument
-ida_add_idalib_exe(myidalib
+ida_add_idalib(myidalib
+    TYPE EXECUTABLE  # Optional, default is EXECUTABLE
     SOURCES
         main.cpp
     DEBUG_ARGS

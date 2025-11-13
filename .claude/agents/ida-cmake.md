@@ -108,7 +108,8 @@ ida_add_loader(myloader
 ...and for a standalone idalib application, use the following CMakeLists.txt:
 
 ```cmake
-ida_add_idalib_exe(myidalib
+ida_add_idalib(myidalib
+    TYPE EXECUTABLE  # or SHARED, STATIC (default: EXECUTABLE)
     SOURCES
         main.cpp
     DEBUG_ARGS

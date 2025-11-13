@@ -278,17 +278,33 @@ function(ida_add_procmod NAME)
     _ida_create_addon_internal(${NAME} "procmod" idasdk::procmod "${IDA_PROCMOD_DIR}" ${ARGN})
 endfunction()
 
-# Function to create an idalib executable
-function(ida_add_idalib_exe NAME)
+# Function to create an idalib target (executable, shared library, or static library)
+function(ida_add_idalib NAME)
     cmake_parse_arguments(ARG
         ""
-        "OUTPUT_NAME;DEBUG_ARGS;DEBUG_WORKING_DIR"
+        "TYPE;OUTPUT_NAME;DEBUG_ARGS;DEBUG_WORKING_DIR"
         "SOURCES;LIBRARIES;INCLUDES;DEFINES"
         ${ARGN}
     )
 
-    # Create the executable
-    add_executable(${NAME} ${ARG_SOURCES})
+    # Default to EXECUTABLE for backward compatibility
+    if(NOT ARG_TYPE)
+        set(ARG_TYPE "EXECUTABLE")
+    endif()
+
+    # Validate TYPE
+    if(NOT ARG_TYPE MATCHES "^(EXECUTABLE|SHARED|STATIC)$")
+        message(FATAL_ERROR "ida_add_idalib: Invalid TYPE '${ARG_TYPE}'. Must be EXECUTABLE, SHARED, or STATIC")
+    endif()
+
+    # Create target based on TYPE
+    if(ARG_TYPE STREQUAL "EXECUTABLE")
+        add_executable(${NAME} ${ARG_SOURCES})
+    elseif(ARG_TYPE STREQUAL "SHARED")
+        add_library(${NAME} SHARED ${ARG_SOURCES})
+    else()  # STATIC
+        add_library(${NAME} STATIC ${ARG_SOURCES})
+    endif()
 
     # Link to base configuration and idalib (order matters for property inheritance)
     target_link_libraries(${NAME}
@@ -317,8 +333,8 @@ function(ida_add_idalib_exe NAME)
         target_compile_definitions(${NAME} PRIVATE ${ARG_DEFINES})
     endif()
 
-    # Debug configuration
-    if(ARG_DEBUG_ARGS OR ARG_DEBUG_WORKING_DIR)
+    # Debug configuration (only for executables)
+    if(ARG_TYPE STREQUAL "EXECUTABLE" AND (ARG_DEBUG_ARGS OR ARG_DEBUG_WORKING_DIR))
         set(DEBUG_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
         if(ARG_DEBUG_WORKING_DIR)
             set(DEBUG_DIR ${ARG_DEBUG_WORKING_DIR})

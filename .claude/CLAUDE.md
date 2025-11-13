@@ -35,7 +35,8 @@ Use the provided CMake functions in any project's CMakeLists.txt:
   - Supports optional `METADATA_JSON` parameter for IDA 9.x plugin metadata deployment
 - `ida_add_loader()` - Create file loader
 - `ida_add_procmod()` - Create processor module
-- `ida_add_idalib()` - Create standalone idalib application
+- `ida_add_idalib()` - Create idalib target (executable, shared library, or static library)
+  - Use `TYPE` parameter to specify EXECUTABLE (default), SHARED, or STATIC
 
 ### Testing
 - Built addons are automatically deployed to `$IDABIN/plugins/`, `$IDABIN/loaders/`, or `$IDABIN/procs/`

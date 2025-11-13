@@ -123,12 +123,26 @@ ida_add_procmod(myproc
 )
 ```
 
-#### `ida_add_idalib_exe(name ...)`
-Creates an executable using IDA as a library. For vanilla CMake approach, see [`templates/idalib-vanilla/`](templates/idalib-vanilla/).
+#### `ida_add_idalib(name ...)`
+Creates a target using IDA as a library. Can build executables, shared libraries, or static libraries. For vanilla CMake approach, see [`templates/idalib-vanilla/`](templates/idalib-vanilla/).
 
 ```cmake
-ida_add_idalib_exe(myapp
+# Executable (default)
+ida_add_idalib(myapp
     SOURCES main.cpp
+    TYPE EXECUTABLE  # Optional, default
+)
+
+# Shared library
+ida_add_idalib(mylib
+    SOURCES lib.cpp
+    TYPE SHARED
+)
+
+# Static library
+ida_add_idalib(mystatic
+    SOURCES static.cpp
+    TYPE STATIC
 )
 ```
 

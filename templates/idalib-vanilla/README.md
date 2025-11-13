@@ -4,7 +4,7 @@ This template demonstrates building IDA Pro standalone applications (using IDA a
 
 ## Overview
 
-Unlike the convenience function approach (`ida_add_idalib_exe()`), this template uses vanilla CMake commands:
+Unlike the convenience function approach (`ida_add_idalib()`), this template uses vanilla CMake commands:
 - `add_executable()` to create the application
 - `target_link_libraries()` to link with `idasdk::idalib`
 - Manual configuration of runtime paths and platform settings
@@ -19,7 +19,7 @@ Choose the vanilla CMake approach when you:
 
 ## What You Need to Handle Manually
 
-When using vanilla CMake instead of `ida_add_idalib_exe()`, you must configure:
+When using vanilla CMake instead of `ida_add_idalib()`, you must configure:
 
 1. **Runtime paths** - RPATH settings for finding IDA's shared libraries
 2. **Platform settings** - PATH environment (Windows), RPATH (Unix/macOS)
@@ -105,7 +105,7 @@ set_target_properties(myidalib PROPERTIES
 
 The convenience function approach:
 ```cmake
-ida_add_idalib_exe(myidalib SOURCES main.cpp)
+ida_add_idalib(myidalib SOURCES main.cpp)
 ```
 
 Is equivalent to this vanilla CMake code:
