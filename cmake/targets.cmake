@@ -185,13 +185,39 @@ endfunction()
 
 # Public function to add an IDA plugin
 function(ida_add_plugin NAME)
-    # Parse arguments including METADATA_JSON and standard arguments
+    # Parse arguments including METADATA_JSON, TYPE, and standard arguments
     cmake_parse_arguments(PLUGIN
         ""
-        "METADATA_JSON;OUTPUT_NAME;DEBUG_ARGS;DEBUG_PROGRAM;DEBUG_WORKING_DIR"
-        "SOURCES;LIBRARIES;INCLUDES;DEFINES"
+        "TYPE;METADATA_JSON;OUTPUT_NAME;DEBUG_ARGS;DEBUG_PROGRAM;DEBUG_WORKING_DIR"
+        "SOURCES;LIBRARIES;INCLUDES;DEFINES;QT_COMPONENTS"
         ${ARGN}
     )
+
+    # Handle Qt plugins (TYPE QT)
+    if(PLUGIN_TYPE STREQUAL "QT")
+        if(NOT PLUGIN_QT_COMPONENTS)
+            message(FATAL_ERROR "${NAME}: TYPE QT specified but QT_COMPONENTS not provided")
+        endif()
+
+        # Try to find Qt6 with requested components
+        find_package(Qt6 QUIET COMPONENTS ${PLUGIN_QT_COMPONENTS})
+
+        if(NOT Qt6_FOUND)
+            message(STATUS "${NAME}: Qt6 not found, skipping Qt plugin (run: cmake --build . --target build_qt)")
+            return()
+        endif()
+
+        message(STATUS "${NAME}: Building Qt plugin with components: ${PLUGIN_QT_COMPONENTS}")
+
+        # Add Qt libraries to link list
+        foreach(component ${PLUGIN_QT_COMPONENTS})
+            list(APPEND PLUGIN_LIBRARIES Qt6::${component})
+        endforeach()
+
+        # Qt AUTOMOC/RCC/UIC will be enabled as target properties after target creation
+    elseif(PLUGIN_TYPE AND NOT PLUGIN_TYPE STREQUAL "QT")
+        message(FATAL_ERROR "${NAME}: Invalid TYPE '${PLUGIN_TYPE}'. Supported types: QT")
+    endif()
 
     # Determine output directory based on metadata presence
     set(OUTPUT_DIR "${IDA_PLUGIN_DIR}")
@@ -246,6 +272,15 @@ function(ida_add_plugin NAME)
 
     # Create the plugin using internal function
     _ida_create_addon_internal(${NAME} "plugin" idasdk::plugin "${OUTPUT_DIR}" ${INTERNAL_ARGS})
+
+    # Enable Qt's AUTOMOC, AUTORCC, AUTOUIC for Qt plugins
+    if(PLUGIN_TYPE STREQUAL "QT")
+        set_target_properties(${NAME} PROPERTIES
+            AUTOMOC ON
+            AUTORCC ON
+            AUTOUIC ON
+        )
+    endif()
 
     # Post-build: Copy JSON file and flatten multi-config if metadata enabled
     if(PLUGIN_METADATA_JSON)

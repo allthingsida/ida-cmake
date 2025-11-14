@@ -33,6 +33,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/platform.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/compiler.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/targets.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/utilities.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/QtSupport.cmake)
 
 # Handle macOS universal binary library merging
 if(IDA_UNIVERSAL_BINARY)
