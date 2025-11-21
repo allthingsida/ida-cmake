@@ -146,6 +146,20 @@ ida_add_idalib(mystatic
 )
 ```
 
+## Qt Plugin Support
+
+Building Qt plugins (`qproject`, `qwindow`) requires Qt 6.8.2 with `QT_NAMESPACE=QT`. ida-cmake provides automated building:
+
+```bash
+cmake --build build --target build_qt  # One-time: ~1-2 hours, ~2GB
+cmake -B build                          # Reconfigure to detect Qt
+cmake --build build --config Release    # Build with Qt support
+```
+
+Qt installs to `build/qt-install/` and is auto-detected for future builds. Qt plugins are skipped if Qt is unavailable.
+
+**External Qt:** Set `CMAKE_PREFIX_PATH` to your Qt 6.8.x installation (must have `QT_NAMESPACE=QT`).
+
 ## IDA 9.x Plugin Metadata
 
 IDA Pro 9.0+ supports organizing plugins in subfolders with `ida-plugin.json` metadata files. This feature is **optional** and **opt-in**.

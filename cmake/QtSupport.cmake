@@ -17,8 +17,8 @@
 include(ExternalProject)
 
 # Qt configuration
-set(QT_VERSION "6.5.3" CACHE STRING "Qt version to build")
-set(QT_SOURCE_URL "https://download.qt.io/archive/qt/6.5/${QT_VERSION}/single/qt-everywhere-src-${QT_VERSION}.tar.xz")
+set(QT_VERSION "6.8.2" CACHE STRING "Qt version to build")
+set(QT_SOURCE_URL "https://download.qt.io/archive/qt/6.8/${QT_VERSION}/single/qt-everywhere-src-${QT_VERSION}.tar.xz")
 set(QT_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/qt-install" CACHE PATH "Qt installation directory")
 
 # =================================================================
@@ -99,7 +99,7 @@ set(CMAKE_CXX_COMPILER \"${CMAKE_CXX_COMPILER}\" CACHE FILEPATH \"CXX compiler\"
 ExternalProject_Add(qt6_external
     PREFIX "${CMAKE_BINARY_DIR}/qt-prefix"
     URL ${QT_SOURCE_URL}
-    URL_HASH SHA256=7cda4d119aad27a3887329cfc285f2aba5da85601212bcb0aea27bd6b7b544cb  # Qt 6.5.3 hash
+    URL_HASH SHA256=659d8bb5931afac9ed5d89a78e868e6bd00465a58ab566e2123db02d674be559  # Qt 6.8.2 hash (verified)
     SOURCE_DIR "${CMAKE_BINARY_DIR}/qt-src"
     BINARY_DIR "${CMAKE_BINARY_DIR}/qt-build"
 
