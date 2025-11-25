@@ -1,0 +1,42 @@
+name: build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - os: Linux
+            runner: ubuntu-latest
+          - os: macOS
+            runner: macos-latest
+          - os: Windows
+            runner: windows-latest
+    env:
+      IDASDK: ${{ github.workspace }}/ida-sdk/src
+    steps:
+      - name: Checkout ida-cmake
+        uses: actions/checkout@v4
+
+      - name: Setup IDA SDK
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
+          mkdir -p "${IDASDK}/ida-cmake"
+          cp -r bootstrap.cmake idasdkConfig.cmake cmake templates samples "${IDASDK}/ida-cmake/"
+
+      - name: Build all templates
+        shell: bash
+        run: cmake -P "${IDASDK}/ida-cmake/cmake/ci.cmake"

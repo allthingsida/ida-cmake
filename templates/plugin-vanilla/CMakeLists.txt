@@ -43,7 +43,7 @@ ida_disable_warnings(myplugin)
 if(CMAKE_GENERATOR MATCHES "Visual Studio" OR CMAKE_GENERATOR MATCHES "Ninja Multi-Config")
     # For multi-config generators
     set_target_properties(myplugin PROPERTIES
-        VS_DEBUGGER_COMMAND "$<IF:$<EQUAL:${IDA_ARCH},32>,${IDABIN}/idat.exe,${IDABIN}/idat64.exe>"
+        VS_DEBUGGER_COMMAND "$<IF:$<STREQUAL:${IDA_ARCH},x86>,${IDABIN}/idat.exe,${IDABIN}/idat64.exe>"
         VS_DEBUGGER_COMMAND_ARGUMENTS "${IDA_CMAKE_DIR}/samples/wizmo32.exe.i64"
     )
 else()
