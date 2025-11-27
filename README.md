@@ -332,6 +332,9 @@ The agent provides expertise in:
 - Platform-specific build issues
 - IDA SDK API usage and examples
 - Debugging setup for VS Code and Visual Studio
+- GitHub Actions CI/CD workflow setup
+- Multi-platform release pipelines
+- `ida-plugin.json` metadata file generation
 
 ## Platform-Specific Notes
 

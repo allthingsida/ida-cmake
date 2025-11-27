@@ -16,6 +16,7 @@ jobs:
     name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: Linux
@@ -40,3 +41,39 @@ jobs:
       - name: Build all templates
         shell: bash
         run: cmake -P "${IDASDK}/ida-cmake/cmake/ci.cmake"
+
+  # Test macOS universal binary support (Issue #19)
+  macos-universal:
+    name: Build (macOS Universal)
+    runs-on: macos-latest
+    env:
+      IDASDK: ${{ github.workspace }}/ida-sdk/src
+    steps:
+      - name: Checkout ida-cmake
+        uses: actions/checkout@v4
+
+      - name: Setup IDA SDK
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
+          mkdir -p "${IDASDK}/ida-cmake"
+          cp -r bootstrap.cmake idasdkConfig.cmake cmake templates samples "${IDASDK}/ida-cmake/"
+
+      - name: Build plugin template (universal binary)
+        shell: bash
+        run: |
+          cd "${IDASDK}/ida-cmake/templates/plugin"
+          cmake -B build -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          cmake --build build --config Release
+
+      - name: Verify universal binary
+        shell: bash
+        run: |
+          # Plugin is deployed to $IDASDK/bin/plugins/ (default IDABIN)
+          PLUGIN="${IDASDK}/bin/plugins/myplugin.dylib"
+          echo "Checking plugin: $PLUGIN"
+          lipo -info "$PLUGIN"
+          # Verify it contains both architectures
+          lipo -info "$PLUGIN" | grep -q "arm64" || (echo "Missing arm64!" && exit 1)
+          lipo -info "$PLUGIN" | grep -q "x86_64" || (echo "Missing x86_64!" && exit 1)
+          echo "Plugin universal binary verified successfully!"

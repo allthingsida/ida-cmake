@@ -90,3 +90,12 @@ cmake --build build --config Release
 ```
 
 The merged universal libraries are created in `build/ida-universal-libs/` and automatically linked to your addon. No manual `lipo` steps needed!
+
+### CI/CD Reference
+
+The ida-cmake agent (`.claude/agents/ida-cmake.md`) includes templates for:
+- GitHub Actions CI workflow for multi-platform builds
+- Release workflow with artifact packaging
+- `ida-plugin.json` metadata generation
+
+When helping users set up CI/CD, refer to the agent file for complete workflow templates.
