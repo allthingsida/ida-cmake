@@ -304,7 +304,7 @@ Ready-to-use templates are available in `$IDASDK/ida-cmake/templates/`:
 Copy a template to start your project:
 
 ```bash
-cp -r %IDASDK%/ida-cmake/templates/plugin/* my-plugin/
+cp -r $IDASDK/ida-cmake/templates/plugin/* my-plugin/
 cd my-plugin
 cmake -B build
 cmake --build build
