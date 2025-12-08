@@ -113,7 +113,12 @@ ExternalProject_Add(qt6_external
     INSTALL_COMMAND ${CMAKE_COMMAND} --install . --config Release
 
     EXCLUDE_FROM_ALL TRUE
-    STEP_TARGETS download configure build install
+)
+
+# Create step targets but exclude them from ALL_BUILD
+ExternalProject_Add_StepTargets(qt6_external download configure build install)
+set_target_properties(qt6_external-download qt6_external-configure qt6_external-build qt6_external-install
+    PROPERTIES EXCLUDE_FROM_ALL TRUE
 )
 
 # Custom target for user-friendly invocation
