@@ -4,98 +4,95 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ida-cmake is a CMake build system for developing IDA Pro addons (plugins, loaders, processor modules, and idalib applications) using the IDA SDK. It provides a clean interface library approach with automatic IDE configuration and cross-platform support.
+ida-cmake is a CMake build system for developing IDA Pro addons (plugins, loaders, processor modules, and standalone idalib applications) using the IDA SDK 9.2+.
 
-## Environment Setup
+## Build Commands
 
-Two environment variables are required:
-- `IDASDK`: Path to IDA SDK installation (e.g., `C:\idasdk92` on Windows)
-- `IDABIN`: (Optional) Path to IDA binaries, defaults to `$IDASDK/bin`
-
-## Common Commands
-
-### Building Projects
 ```bash
-# Standard build
+# Configure and build (from any template or project using ida-cmake)
 cmake -B build
 cmake --build build --config Release
 
-# Debug build
-cmake -DCMAKE_BUILD_TYPE=Debug -B build
-cmake --build build
+# Build with specific configuration
+cmake --build build --config RelWithDebInfo
 
-# Clean rebuild
-cmake --build build --target clean
-cmake --build build
+# Build Qt support (one-time, ~1-2 hours)
+cmake --build build --target build_qt
+
+# Install Claude agent to a project
+cmake --build build --target install_idacmake_agent
 ```
 
-### Creating New Addons
-Use the provided CMake functions in any project's CMakeLists.txt:
-- `ida_add_plugin()` - Create IDA plugin
-  - Supports optional `METADATA_JSON` parameter for IDA 9.x plugin metadata deployment
-- `ida_add_loader()` - Create file loader
-- `ida_add_procmod()` - Create processor module
-- `ida_add_idalib()` - Create idalib target (executable, shared library, or static library)
-  - Use `TYPE` parameter to specify EXECUTABLE (default), SHARED, or STATIC
+## Environment Setup
 
-### Testing
-- Built addons are automatically deployed to `$IDABIN/plugins/`, `$IDABIN/loaders/`, or `$IDABIN/procs/`
-- Use sample IDB files from `samples/` for testing
-- Debug configurations are auto-generated for VS Code, Visual Studio, and CLion
+Required environment variable:
+- `IDASDK` - Path to IDA SDK directory (e.g., `C:\idasdk92` or `/path/to/idasdk92`)
+
+Optional:
+- `IDABIN` - Path to IDA installation (defaults to `$IDASDK/bin`)
 
 ## Architecture
 
-### Core Components
-- **bootstrap.cmake**: Entry point that validates environment and includes all modules
-- **idasdkConfig.cmake**: Main package configuration with interface targets
-- **cmake/targets.cmake**: Functions for creating addon targets
-- **cmake/platform.cmake**: Platform/architecture detection
-- **cmake/compiler.cmake**: Compiler-specific settings
+### CMake Module Structure
 
-### Interface Targets
-The system provides clean interface libraries:
-- `idasdk::plugin` - For IDA plugins
-- `idasdk::loader` - For file loaders
-- `idasdk::procmod` - For processor modules
-- `idasdk::idalib` - For standalone applications
-
-All targets automatically inherit platform settings, compiler flags, and SDK dependencies.
-
-## Development Workflow
-
-1. Set `IDASDK` environment variable to SDK path
-2. Include bootstrap.cmake in project CMakeLists.txt
-3. Use `find_package(idasdk REQUIRED)`
-4. Add addons with `ida_add_*` functions
-5. Build normally with CMake
-
-Templates are provided in `/templates/` for each addon type with working examples.
-
-## Important Notes
-
-- Minimum CMake version: 3.27
-- Supported IDA SDK: 9.0+
-- All platforms build with EA64 (64-bit addressing)
-- Compiler warnings from IDA SDK headers are automatically suppressed
-- Debug builds include sanitizers and enhanced debugging on supported platforms
-
-### macOS Universal Binary Support
-
-**Universal binaries are fully supported!** When `CMAKE_OSX_ARCHITECTURES` contains multiple architectures (e.g., `arm64;x86_64`), ida-cmake automatically merges the architecture-specific IDA SDK libraries using `lipo` at configure time.
-
-**Usage:**
-```bash
-cmake -B build -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
-cmake --build build --config Release
+```
+bootstrap.cmake          # Entry point: sets CMAKE_PREFIX_PATH, auto-detects GitHub vs zip SDK structure
+idasdkConfig.cmake       # Package config: creates interface targets, handles universal binaries
+cmake/
+├── platform.cmake       # Platform detection (Windows/Linux/macOS), library paths
+├── compiler.cmake       # Compiler settings (MSVC/GCC/Clang), warning suppression
+├── targets.cmake        # ida_add_plugin(), ida_add_loader(), ida_add_procmod(), ida_add_idalib()
+├── utilities.cmake      # SDK version detection, environment validation
+├── QtSupport.cmake      # Qt 6.8.2 building and detection
+└── agent.cmake          # Claude agent installation target
 ```
 
-The merged universal libraries are created in `build/ida-universal-libs/` and automatically linked to your addon. No manual `lipo` steps needed!
+### Interface Targets
 
-### CI/CD Reference
+- `idasdk::plugin` - For IDA plugins (defines `__IDP__`)
+- `idasdk::loader` - For file loaders (defines `__LOADER__`, includes `ldr/`)
+- `idasdk::procmod` - For processor modules (includes `module/`)
+- `idasdk::idalib` - For standalone applications using IDA as library (defines `IDALIB_IMPL`)
 
-The ida-cmake agent (`.claude/agents/ida-cmake.md`) includes templates for:
-- GitHub Actions CI workflow for multi-platform builds
-- Release workflow with artifact packaging
-- `ida-plugin.json` metadata generation
+All targets automatically handle: includes, defines, platform settings, compiler flags, and library linking.
 
-When helping users set up CI/CD, refer to the agent file for complete workflow templates.
+### Convenience Functions
+
+```cmake
+ida_add_plugin(name SOURCES ... [LIBRARIES ...] [INCLUDES ...] [DEFINES ...] [METADATA_JSON ...])
+ida_add_loader(name SOURCES ...)
+ida_add_procmod(name SOURCES ...)
+ida_add_idalib(name SOURCES ... [TYPE EXECUTABLE|SHARED|STATIC])
+```
+
+### Templates
+
+Located in `templates/`:
+- `plugin/` - Basic plugin (convenience functions)
+- `plugin-pch/` - Plugin with precompiled headers
+- `plugin-vanilla/` - Plugin using standard CMake
+- `plugin-no-bootstrap/` - Plugin using CMAKE_PREFIX_PATH approach
+- `loader/` - File loader
+- `procmod/` - Processor module
+- `idalib/` - Standalone idalib application
+- `idalib-vanilla/` - idalib using standard CMake
+
+## Key Design Decisions
+
+1. **64-bit only**: Always uses EA64 (`__EA64__` defined)
+2. **C++17 required**: Set via `ida_addon_base` interface library
+3. **Auto-deployment**: Addons are automatically copied to `$IDABIN/plugins/`, `loaders/`, or `procs/`
+4. **Warning suppression**: IDA SDK warnings are suppressed via `ida_disable_warnings()`
+5. **macOS universal binaries**: Automatic `lipo` merging when `CMAKE_OSX_ARCHITECTURES` includes multiple architectures
+
+## Plugin Metadata (IDA 9.x)
+
+Optional `ida-plugin.json` support for IDA 9.0+ plugin organization:
+```cmake
+ida_add_plugin(myplugin
+    SOURCES main.cpp
+    METADATA_JSON ida-plugin.json  # Deploys to plugins/myplugin/ subfolder
+)
+```
+
+If the JSON file doesn't exist, ida-cmake generates a template automatically.
