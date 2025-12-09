@@ -470,3 +470,111 @@ ida_add_plugin(myanalyzer
         ida-plugin.json
 )
 ```
+
+## Precompiled Headers (PCH)
+
+Precompiled headers significantly speed up compilation by pre-parsing stable headers that rarely change (IDA SDK, STL).
+
+### When to Use PCH
+
+- Projects with multiple source files
+- Development cycles with frequent rebuilds
+- Large plugins that include many SDK headers
+
+### PCH Template
+
+Use the `plugin-pch` template for projects with PCH support:
+
+```bash
+cp -r $IDASDK/ida-cmake/templates/plugin-pch/* my-plugin/
+```
+
+### PCH File Structure
+
+Create a `pch.h` file with stable headers:
+
+```cpp
+// pch.h - Precompiled header
+#pragma once
+
+#define PLUGIN_PCH_INCLUDED  // Marker for fallback includes
+
+// Standard Library
+#include <algorithm>
+#include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+
+// IDA SDK Core
+#include <pro.h>
+#include <ida.hpp>
+#include <idp.hpp>
+#include <loader.hpp>
+#include <kernwin.hpp>
+#include <bytes.hpp>
+#include <funcs.hpp>
+#include <auto.hpp>
+#include <nalt.hpp>
+#include <netnode.hpp>
+#include <segment.hpp>
+#include <name.hpp>
+#include <ua.hpp>
+#include <xref.hpp>
+
+// Hex-Rays (if needed)
+// #include <hexrays.hpp>
+```
+
+### CMake PCH Configuration
+
+Add PCH support to CMakeLists.txt:
+
+```cmake
+ida_add_plugin(myplugin
+    SOURCES
+        main.cpp
+        plugin.h
+        pch.h
+    DEBUG_ARGS
+        "${SAMPLE_IDB}"
+)
+
+# Enable PCH
+option(USE_PCH "Use precompiled headers" ON)
+
+if(USE_PCH)
+    target_precompile_headers(myplugin PRIVATE
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/pch.h>"
+    )
+endif()
+```
+
+### Fallback Headers in Plugin Header
+
+Your `plugin.h` should handle both PCH and non-PCH builds:
+
+```cpp
+// plugin.h
+#pragma once
+
+// Fallback when PCH is disabled
+#ifndef PLUGIN_PCH_INCLUDED
+#include <ida.hpp>
+#include <idp.hpp>
+#include <loader.hpp>
+#include <kernwin.hpp>
+#endif
+
+// Plugin-specific declarations
+#define PLUGIN_NAME "MyPlugin"
+```
+
+### Disable PCH
+
+To build without PCH:
+
+```bash
+cmake -B build -DUSE_PCH=OFF
+```
