@@ -294,6 +294,7 @@ Most users don't need these targets unless developing custom debugger plugins.
 Ready-to-use templates are available in `$IDASDK/ida-cmake/templates/`:
 
 - `plugin/` - Basic plugin template (convenience functions)
+- `plugin-pch/` - Plugin with precompiled header support (faster builds)
 - `plugin-vanilla/` - Plugin using standard CMake commands
 - `plugin-no-bootstrap/` - Plugin using CMAKE_PREFIX_PATH approach (no bootstrap include)
 - `loader/` - File loader template
