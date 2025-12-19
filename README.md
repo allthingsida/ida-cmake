@@ -158,7 +158,17 @@ cmake --build build --config Release    # Build with Qt support
 
 Qt installs to `build/qt-install/` and is auto-detected for future builds. Qt plugins are skipped if Qt is unavailable.
 
-**External Qt:** Set `CMAKE_PREFIX_PATH` to your Qt 6.8.x installation (must have `QT_NAMESPACE=QT`).
+**Using Qt in your plugin:**
+```cmake
+ida_add_plugin(my_qt_plugin
+    SOURCES main.cpp
+    LIBRARIES Qt6::Core Qt6::Gui Qt6::Widgets
+)
+```
+
+**External Qt:** Set `CMAKE_PREFIX_PATH` or `Qt6_DIR` to a Qt 6.8.x installation built with `QT_NAMESPACE=QT`. Standard Qt installations won't work.
+
+> **Note:** The `build_qt` target requires Ninja. If unavailable, edit `cmake/QtSupport.cmake` and change `CMAKE_GENERATOR Ninja` to `CMAKE_GENERATOR "NMake Makefiles"`.
 
 ## IDA 9.x Plugin Metadata
 
