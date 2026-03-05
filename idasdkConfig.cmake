@@ -143,12 +143,15 @@ if(NOT TARGET idasdk::idalib)
     )
 
     # Link to platform and compiler settings, plus BOTH idalib and ida libraries
-    # Note: idalib.lib requires ida.lib for some symbols
+    # Note: ida must come BEFORE idalib because both stubs export overlapping
+    # symbols (qvector_reserve, qalloc_or_throw, qfree, etc.), but at runtime
+    # only libida actually provides them. Wrong order causes two-level namespace
+    # binding failures on macOS.
     target_link_libraries(idasdk::idalib INTERFACE
         ida_platform_settings
         ida_compiler_settings
-        "${IDALIB_PATH}"
-        "${IDA_LIB_PATH}")
+        "${IDA_LIB_PATH}"
+        "${IDALIB_PATH}")
 endif()
 
 # Debugger module support (optional, disabled by default)
