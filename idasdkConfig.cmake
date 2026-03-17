@@ -50,7 +50,10 @@ if(IDA_UNIVERSAL_BINARY)
                 message(FATAL_ERROR "Unsupported architecture for universal binary: ${_arch}")
             endif()
 
-            set(_lib_dir "${IDASDK}/lib/${_ida_arch}_${IDA_PLATFORM_NAME}_${IDA_COMPILER}_64")
+            set(_lib_dir "${IDASDK}/lib/${_ida_arch}_${IDA_PLATFORM_NAME}_64")
+            if(NOT EXISTS "${_lib_dir}")
+                set(_lib_dir "${IDASDK}/lib/${_ida_arch}_${IDA_PLATFORM_NAME}_${IDA_COMPILER}_64")
+            endif()
             set(_lib_path "${_lib_dir}/lib${_lib_basename}.dylib")
 
             if(NOT EXISTS "${_lib_path}")
