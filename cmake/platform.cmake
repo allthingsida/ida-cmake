@@ -78,7 +78,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(IDA_PLATFORM "LINUX")
     set(IDA_PLATFORM_NAME "linux")
-    set(IDA_ARCH "x64")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
+        set(IDA_ARCH "arm64")
+    else()
+        set(IDA_ARCH "x64")
+    endif()
     set(IDAPROPLAT "__LINUX__")
 
     # Compiler detection for Linux
