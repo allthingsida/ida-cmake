@@ -3,7 +3,7 @@ project(i51)
 set(CMAKE_CXX_STANDARD 17)
 
 # Include IDA SDK bootstrap
-include($ENV{IDASDK}/ida-cmake/bootstrap.cmake)
+include($ENV{IDASDK}/src/cmake/bootstrap.cmake)
 find_package(idasdk REQUIRED)
 
 # Add processor module

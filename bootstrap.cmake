@@ -1,6 +1,6 @@
 # IDA SDK CMake Bootstrap
 # This file sets up the CMAKE_PREFIX_PATH and MODULE_PATH to find the IDASDK package
-# Usage: include($ENV{IDASDK}/ida-cmake/bootstrap.cmake)
+# Usage: include($ENV{IDASDK}/src/cmake/bootstrap.cmake)
 
 if(NOT DEFINED ENV{IDASDK})
     message(FATAL_ERROR "IDASDK environment variable not set. Please set it to your IDA SDK directory.")
