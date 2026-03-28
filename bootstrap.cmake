@@ -1,3 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Copyright (c) Elias Bachaalany
+
 # IDA SDK CMake Bootstrap
 # This file sets up the CMAKE_PREFIX_PATH and MODULE_PATH to find the IDASDK package
 # Usage: include($ENV{IDASDK}/src/cmake/bootstrap.cmake)
