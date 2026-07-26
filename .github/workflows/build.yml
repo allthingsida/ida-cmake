@@ -61,11 +61,11 @@ jobs:
         shell: bash
         run: cmake -P "${IDASDK}/ida-cmake/cmake/ci.cmake"
 
-  # Windows-on-ARM cross-build. ARM64 Windows libraries exist only in SDK 9.4,
-  # so this job runs a single version and cross-compiles ARM64 on an x64 runner.
+  # Windows-on-ARM native build on a real ARM64 runner. ARM64 Windows libraries
+  # exist only in SDK 9.4.
   windows-arm64:
-    name: Build (Windows ARM64 cross, v9.4.0-release)
-    runs-on: windows-latest
+    name: Build (Windows ARM64 native, v9.4.0-release)
+    runs-on: windows-11-arm
     env:
       IDASDK: ${{ github.workspace }}/ida-sdk
       IDA_CI_ARCH: ARM64
@@ -79,7 +79,32 @@ jobs:
           git clone --branch v9.4.0-release --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
           git clone --local . "${IDASDK}/ida-cmake"
 
-      - name: Cross-build all templates for ARM64
+      - name: Build all templates (ARM64)
+        shell: bash
+        run: cmake -P "${IDASDK}/ida-cmake/cmake/ci.cmake"
+
+  # Linux ARM64 native build on a real ARM64 runner. arm64_linux libraries ship
+  # in SDK 9.3.1-sdk.1 and later (not 9.2).
+  linux-arm64:
+    name: Build (Linux ARM64 native, ${{ matrix.sdk }})
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [v9.3.1-sdk.1, v9.4.0-release]
+    env:
+      IDASDK: ${{ github.workspace }}/ida-sdk
+    steps:
+      - name: Checkout ida-cmake
+        uses: actions/checkout@v4
+
+      - name: Setup IDA SDK (${{ matrix.sdk }}) with our ida-cmake
+        shell: bash
+        run: |
+          git clone --branch ${{ matrix.sdk }} --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
+          git clone --local . "${IDASDK}/ida-cmake"
+
+      - name: Build all templates
         shell: bash
         run: cmake -P "${IDASDK}/ida-cmake/cmake/ci.cmake"
 
