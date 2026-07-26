@@ -1,36 +1,45 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Copyright (c) 2019-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# Copyright (c) Elias Bachaalany
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 # IDA SDK CMake Bootstrap
 # This file sets up the CMAKE_PREFIX_PATH and MODULE_PATH to find the IDASDK package
-# Usage: include($ENV{IDASDK}/src/cmake/bootstrap.cmake)
+# Usage: include($ENV{IDASDK}/ida-cmake/bootstrap.cmake)
 
-if(NOT DEFINED ENV{IDASDK})
-    message(FATAL_ERROR "IDASDK environment variable not set. Please set it to your IDA SDK directory.")
+# Resolve the SDK root. A -DIDASDK=<path> cache variable takes precedence over
+# the IDASDK environment variable, so an alternate SDK (e.g. a 9.4 working copy)
+# can be selected per build without changing the global environment.
+if(DEFINED IDASDK AND NOT IDASDK STREQUAL "")
+    set(_IDASDK_ROOT "${IDASDK}")
+elseif(DEFINED ENV{IDASDK})
+    set(_IDASDK_ROOT "$ENV{IDASDK}")
+else()
+    message(FATAL_ERROR "IDASDK not set. Pass -DIDASDK=<path> or set the IDASDK environment variable to your IDA SDK directory.")
 endif()
 
-# Validate IDASDK path exists and contains expected files
-if(NOT EXISTS "$ENV{IDASDK}")
-    message(FATAL_ERROR "IDASDK path does not exist: $ENV{IDASDK}")
+# Validate the SDK path exists
+if(NOT EXISTS "${_IDASDK_ROOT}")
+    message(FATAL_ERROR "IDASDK path does not exist: ${_IDASDK_ROOT}")
 endif()
 
 # Auto-detect SDK structure: GitHub clone has files under src/, zip distribution at root
-set(_IDASDK_ACTUAL "$ENV{IDASDK}")
+set(_IDASDK_ACTUAL "${_IDASDK_ROOT}")
 if(NOT EXISTS "${_IDASDK_ACTUAL}/include/pro.h")
     # Check if this is a GitHub clone with src/ subdirectory
     if(EXISTS "${_IDASDK_ACTUAL}/src/include/pro.h")
         set(_IDASDK_ACTUAL "${_IDASDK_ACTUAL}/src")
         message(STATUS "Detected GitHub SDK structure, using: ${_IDASDK_ACTUAL}")
     else()
-        message(FATAL_ERROR "Invalid IDASDK directory (missing include/pro.h): $ENV{IDASDK}")
+        message(FATAL_ERROR "Invalid IDASDK directory (missing include/pro.h): ${_IDASDK_ROOT}")
     endif()
 endif()
 
-# Override IDASDK environment variable for this CMake run with the adjusted path
+# Propagate the resolved path via both the environment variable (backward compat)
+# and the IDASDK cache variable, so find_package(idasdk)/idasdkConfig.cmake use it.
 set(ENV{IDASDK} "${_IDASDK_ACTUAL}")
+set(IDASDK "${_IDASDK_ACTUAL}" CACHE PATH "Path to the IDA SDK" FORCE)
 
 # Add ida-cmake to the package search path
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR})

@@ -1,8 +1,8 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Copyright (c) 2019-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# Copyright (c) Elias Bachaalany
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 # targets.cmake - Target creation functions for IDA SDK addons
 
@@ -23,6 +23,22 @@ if(NOT TARGET ida_addon_base)
     # Note: ida_platform_settings and ida_compiler_settings are linked via IDASDK::* targets
 endif()
 
+# Redirect a deploy directory to a local staging directory when cross-compiling,
+# so cross-built binaries (e.g. ARM64 addons built on an x64 host) are not
+# installed into the host IDA, where they could not load. Opt back in with
+# -DIDA_FORCE_DEPLOY=ON. Returns the effective directory via OUT_VAR.
+function(_ida_apply_cross_deploy_guard OUT_VAR DEPLOY_DIR NAME QUIET)
+    if(IDA_IS_CROSS_COMPILE AND NOT IDA_FORCE_DEPLOY)
+        set(_staging "${CMAKE_BINARY_DIR}/ida-addons/${IDA_ARCH}")
+        if(NOT QUIET)
+            message(STATUS "${NAME}: cross-compiling for ${IDA_ARCH}; skipping deploy, output -> ${_staging} (set -DIDA_FORCE_DEPLOY=ON to deploy anyway)")
+        endif()
+        set(${OUT_VAR} "${_staging}" PARENT_SCOPE)
+    else()
+        set(${OUT_VAR} "${DEPLOY_DIR}" PARENT_SCOPE)
+    endif()
+endfunction()
+
 # Internal function to handle common addon creation logic
 function(_ida_create_addon_internal NAME TYPE SDK_TARGET OUTPUT_DIR)
     cmake_parse_arguments(ARG
@@ -31,6 +47,9 @@ function(_ida_create_addon_internal NAME TYPE SDK_TARGET OUTPUT_DIR)
         "SOURCES;LIBRARIES;INCLUDES;DEFINES"
         ${ARGN}
     )
+
+    # Redirect output to a local staging dir when cross-compiling (no host deploy)
+    _ida_apply_cross_deploy_guard(OUTPUT_DIR "${OUTPUT_DIR}" "${NAME}" FALSE)
 
     # Create the addon as a shared library
     add_library(${NAME} SHARED ${ARG_SOURCES})
@@ -248,6 +267,10 @@ function(ida_add_plugin NAME)
 
         message(STATUS "${NAME}: deploying with metadata to ${OUTPUT_DIR}")
     endif()
+
+    # Keep the metadata copy and per-config output pinning consistent with the
+    # cross-compile staging redirect applied inside _ida_create_addon_internal.
+    _ida_apply_cross_deploy_guard(OUTPUT_DIR "${OUTPUT_DIR}" "${NAME}" TRUE)
 
     # Reconstruct argument list without METADATA_JSON for internal function
     set(INTERNAL_ARGS "")

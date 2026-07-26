@@ -1,8 +1,8 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Copyright (c) 2019-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# Copyright (c) Elias Bachaalany
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 # platform.cmake - Platform and OS detection for IDA SDK
 
@@ -12,8 +12,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(IDA_PLATFORM_NAME "win")
     set(IDAPROPLAT "__NT__")
 
-    # Detect architecture
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    # Detect architecture. ARM64 (Windows on ARM) must be detected before the
+    # pointer-size fallback, since ARM64 and x64 both have 8-byte pointers.
+    # With Visual Studio generators, cross-targeting ARM64 is selected via
+    # `-A ARM64`, which sets CMAKE_GENERATOR_PLATFORM (and CMAKE_SYSTEM_PROCESSOR).
+    if(CMAKE_GENERATOR_PLATFORM MATCHES "^(ARM64|arm64)$"
+            OR CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|aarch64")
+        set(IDA_ARCH "arm64")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(IDA_ARCH "x64")
     else()
         set(IDA_ARCH "x86")
@@ -134,6 +140,25 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(IDALIB_NAME "libidalib.so")
     set(IDA_SHARED_EXT ".so")
     set(IDA_STATIC_EXT ".a")
+endif()
+
+# Detect cross-compilation (target architecture differs from host). Used to
+# avoid deploying cross-built binaries (e.g. ARM64 addons built on an x64 host)
+# into the host IDA installation, where they would not load.
+string(TOLOWER "${CMAKE_HOST_SYSTEM_PROCESSOR}" _ida_host_proc)
+if(_ida_host_proc MATCHES "arm64|aarch64")
+    set(_ida_host_arch "arm64")
+else()
+    set(_ida_host_arch "x64")
+endif()
+set(_ida_target_arch "${IDA_ARCH}")
+if(_ida_target_arch STREQUAL "x86")
+    set(_ida_target_arch "x64")  # 32-bit shares the x64 host toolchain/dir
+endif()
+if(IDA_ARCH STREQUAL "universal" OR _ida_target_arch STREQUAL _ida_host_arch)
+    set(IDA_IS_CROSS_COMPILE FALSE)
+else()
+    set(IDA_IS_CROSS_COMPILE TRUE)
 endif()
 
 # Output directories for different addon types

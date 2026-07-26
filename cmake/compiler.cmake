@@ -1,8 +1,8 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Copyright (c) 2019-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# Copyright (c) Elias Bachaalany
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 # compiler.cmake - Compiler configuration for IDA SDK
 
@@ -64,7 +64,7 @@ if(MSVC)
         /wd4146     # unary minus operator applied to unsigned type
     )
 
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")  # GNU, Clang, and AppleClang
     # GCC/Clang specific flags
     target_compile_options(ida_compiler_settings INTERFACE
         -Wall
@@ -80,9 +80,14 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "C
         $<$<CONFIG:Release>:-flto>
     )
 
-    # Linker flags
+    # Linker flags. Dead-code stripping differs per linker: GNU ld uses
+    # --gc-sections, while Apple's ld64 uses -dead_strip (issue #25).
+    if(APPLE)
+        target_link_options(ida_compiler_settings INTERFACE -Wl,-dead_strip)
+    else()
+        target_link_options(ida_compiler_settings INTERFACE -Wl,--gc-sections)
+    endif()
     target_link_options(ida_compiler_settings INTERFACE
-        -Wl,--gc-sections
         $<$<CONFIG:Release>:-flto>
     )
 

@@ -1,8 +1,8 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Copyright (c) 2019-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# Copyright (c) Elias Bachaalany
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 name: build
 
@@ -17,13 +17,25 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Every job installs THIS repository's ida-cmake into its own $IDASDK/ida-cmake
+# directory and builds the templates from there. It never reads or writes the
+# SDK's own cmake tree (IDA SDK 9.4 vendors its own cmake under src/cmake), so
+# the templates are always built with this ida-cmake across every SDK version.
+
 jobs:
   build:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.os }}, ${{ matrix.sdk }})
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
+        os: [Linux, macOS, Windows]
+        # SDK versions from https://github.com/HexRaysSA/ida-sdk (git tags).
+        # Pin the latest SDK packaging (-sdk.N) per IDA version; 9.4 has only
+        # -release so far. 9.1 is intentionally absent: the repo has no 9.1 tag
+        # (earliest is 9.2). 9.2 still uses the old compiler-named lib layout,
+        # exercising ida-cmake's lib-dir fallback; 9.3/9.4 use the new layout.
+        sdk: [v9.2.0-sdk.1, v9.3.1-sdk.1, v9.4.0-release]
         include:
           - os: Linux
             runner: ubuntu-latest
@@ -32,38 +44,60 @@ jobs:
           - os: Windows
             runner: windows-latest
     env:
-      IDASDK: ${{ github.workspace }}/ida-sdk/src
+      IDASDK: ${{ github.workspace }}/ida-sdk
     steps:
       - name: Checkout ida-cmake
         uses: actions/checkout@v4
 
-      - name: Setup IDA SDK
+      - name: Setup IDA SDK (${{ matrix.sdk }}) with our ida-cmake
         shell: bash
         run: |
-          git clone --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
-          mkdir -p "${IDASDK}/ida-cmake"
-          cp -r bootstrap.cmake idasdkConfig.cmake cmake templates samples "${IDASDK}/ida-cmake/"
+          git clone --branch ${{ matrix.sdk }} --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
+          # Install this repo's ida-cmake into its own $IDASDK/ida-cmake dir
+          # (independent of the SDK's own src/cmake; we never touch that).
+          git clone --local . "${IDASDK}/ida-cmake"
 
       - name: Build all templates
         shell: bash
         run: cmake -P "${IDASDK}/ida-cmake/cmake/ci.cmake"
 
-  # Test macOS universal binary support (Issue #19)
-  macos-universal:
-    name: Build (macOS Universal)
-    runs-on: macos-latest
+  # Windows-on-ARM cross-build. ARM64 Windows libraries exist only in SDK 9.4,
+  # so this job runs a single version and cross-compiles ARM64 on an x64 runner.
+  windows-arm64:
+    name: Build (Windows ARM64 cross, v9.4.0-release)
+    runs-on: windows-latest
     env:
-      IDASDK: ${{ github.workspace }}/ida-sdk/src
+      IDASDK: ${{ github.workspace }}/ida-sdk
+      IDA_CI_ARCH: ARM64
     steps:
       - name: Checkout ida-cmake
         uses: actions/checkout@v4
 
-      - name: Setup IDA SDK
+      - name: Setup IDA SDK 9.4 with our ida-cmake
         shell: bash
         run: |
-          git clone --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
-          mkdir -p "${IDASDK}/ida-cmake"
-          cp -r bootstrap.cmake idasdkConfig.cmake cmake templates samples "${IDASDK}/ida-cmake/"
+          git clone --branch v9.4.0-release --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
+          git clone --local . "${IDASDK}/ida-cmake"
+
+      - name: Cross-build all templates for ARM64
+        shell: bash
+        run: cmake -P "${IDASDK}/ida-cmake/cmake/ci.cmake"
+
+  # macOS universal binary support (Issue #19).
+  macos-universal:
+    name: Build (macOS Universal, v9.4.0-release)
+    runs-on: macos-latest
+    env:
+      IDASDK: ${{ github.workspace }}/ida-sdk
+    steps:
+      - name: Checkout ida-cmake
+        uses: actions/checkout@v4
+
+      - name: Setup IDA SDK 9.4 with our ida-cmake
+        shell: bash
+        run: |
+          git clone --branch v9.4.0-release --depth 1 https://github.com/HexRaysSA/ida-sdk ida-sdk
+          git clone --local . "${IDASDK}/ida-cmake"
 
       - name: Build plugin template (universal binary)
         shell: bash
@@ -75,11 +109,10 @@ jobs:
       - name: Verify universal binary
         shell: bash
         run: |
-          # Plugin is deployed to $IDASDK/bin/plugins/ (default IDABIN)
-          PLUGIN="${IDASDK}/bin/plugins/myplugin.dylib"
+          # Plugin deploys to <resolved IDASDK>/bin/plugins (default IDABIN)
+          PLUGIN="${IDASDK}/src/bin/plugins/myplugin.dylib"
           echo "Checking plugin: $PLUGIN"
           lipo -info "$PLUGIN"
-          # Verify it contains both architectures
           lipo -info "$PLUGIN" | grep -q "arm64" || (echo "Missing arm64!" && exit 1)
           lipo -info "$PLUGIN" | grep -q "x86_64" || (echo "Missing x86_64!" && exit 1)
           echo "Plugin universal binary verified successfully!"

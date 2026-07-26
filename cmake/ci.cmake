@@ -1,8 +1,8 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Copyright (c) 2019-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# Copyright (c) Elias Bachaalany
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 # ci.cmake - Build all ida-cmake templates for CI validation
 # Usage: cmake -P cmake/ci.cmake
@@ -27,10 +27,17 @@ message(STATUS "===========================================")
 message(STATUS "IDA_CMAKE_ROOT: ${IDA_CMAKE_ROOT}")
 message(STATUS "IDASDK: ${IDASDK}")
 
-# Detect generator and build type args
+# Detect generator and build type args. On Windows the target architecture can
+# be overridden via the IDA_CI_ARCH environment variable (x64 or ARM64) to
+# exercise Windows-on-ARM cross-builds; it defaults to x64.
 if(WIN32)
-    set(GENERATOR_ARGS -A x64)
+    set(_CI_ARCH "$ENV{IDA_CI_ARCH}")
+    if(NOT _CI_ARCH)
+        set(_CI_ARCH "x64")
+    endif()
+    set(GENERATOR_ARGS -A ${_CI_ARCH})
     set(BUILD_ARGS --config Release)
+    message(STATUS "Target architecture: ${_CI_ARCH}")
 else()
     set(GENERATOR_ARGS -DCMAKE_BUILD_TYPE=Release)
     set(BUILD_ARGS "")
