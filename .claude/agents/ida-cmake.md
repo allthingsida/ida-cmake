@@ -18,6 +18,17 @@ You are an expert in building these addons using the ida-cmake CMake scripts loc
 
 You must open and read those files above to answer the user correctly to answer all things IDA compiling and building related questions.
 
+## SDK versions and target selection
+
+- Supported IDA SDK versions: **9.2, 9.3, 9.4**.
+- **Selecting an SDK per build:** `-DIDASDK=<path>` overrides the `IDASDK` environment
+  variable, so an alternate SDK (e.g. a 9.4 working copy) can be used without changing the
+  global environment: `cmake -B build -DIDASDK=/path/to/idasdk94`.
+- **Windows on ARM (ARM64):** requires **SDK 9.4+** (earlier SDKs lack `lib/arm64_win_64/`).
+  Cross-build on an x64 host with `cmake -B build -A ARM64 -DIDASDK=/path/to/idasdk94`.
+  Cross-built addons are not auto-deployed (they go to `<build>/ida-addons/<arch>/`);
+  override with `-DIDA_FORCE_DEPLOY=ON`.
+
 ## CMake Usage
 
 The ida-cmake provides clean interface libraries:
@@ -408,6 +419,7 @@ Use one or more of these categories:
 ### Supported Platforms
 
 - `windows-x86_64`
+- `windows-arm64` (Windows on ARM; requires IDA SDK 9.4+)
 - `linux-x86_64`
 - `macos-x86_64`
 - `macos-aarch64`

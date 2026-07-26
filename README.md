@@ -4,6 +4,8 @@ CMake build system for developing IDA Pro addons (plugins, loaders, processor mo
 
 >For IDA 9.1 and below, please check the [9.1](https://github.com/allthingsida/ida-cmake/tree/9.1) branch.
 
+> **Relationship to the IDA SDK's bundled CMake.** Since IDA SDK 9.4, the SDK ships its own CMake layout (under the SDK's `cmake/` folder) that is *based on* ida-cmake — see the SDK's `cmake/ACKNOWLEDGMENTS.md`, which credits this project. ida-cmake is independent and self-contained: it does not use, require, or depend on the SDK's bundled copy. Install ida-cmake in its own `$IDASDK/ida-cmake` directory and it drives the build entirely on its own.
+
 ## Two Ways to Use ida-cmake
 
 ida-cmake provides **two approaches** for building IDA addons:
@@ -20,8 +22,15 @@ Both approaches are fully supported. Choose based on your preference!
 ### 1. Prerequisites
 
 - CMake 3.27 or later
-- IDA SDK 9.2+ (set `IDASDK` environment variable)
+- IDA SDK 9.2, 9.3, or 9.4 (set `IDASDK` environment variable, or pass `-DIDASDK=<path>` per build)
 - Visual Studio 2022 (Windows) / GCC/Clang (Linux/macOS)
+
+> **Selecting an SDK per build:** `-DIDASDK=<path>` takes precedence over the `IDASDK`
+> environment variable, so you can build against an alternate SDK (e.g. a 9.4 working
+> copy) without changing your global environment:
+> ```bash
+> cmake -B build -DIDASDK=/path/to/idasdk94
+> ```
 
 ### 2. Setup
 
@@ -376,6 +385,27 @@ cmake -B build -DCMAKE_OSX_ARCHITECTURES=arm64  # or x86_64
 ```
 
 **Technical details:** The IDA SDK provides architecture-specific libraries (`lib/arm64_mac_clang_64/libida.dylib` and `lib/x64_mac_clang_64/libida.dylib`). ida-cmake uses `lipo` to merge these into universal libraries stored in `build/ida-universal-libs/`, which are then linked to your addon.
+
+### Windows on ARM (ARM64)
+
+Windows ARM64 addons are supported and require **IDA SDK 9.4 or later** (earlier SDKs
+do not ship Windows ARM64 import libraries, `lib/arm64_win_64/`).
+
+**Cross-compiling on an x64 host** (Visual Studio's ARM64 toolchain, installable via the
+VS Installer):
+
+```bash
+cmake -B build-arm64 -A ARM64 -DIDASDK=/path/to/idasdk94
+cmake --build build-arm64 --config Release
+```
+
+ida-cmake detects the ARM64 target from `-A ARM64` (or a native ARM64 host) and links
+against the SDK's `arm64_win_64` libraries automatically.
+
+**Deployment when cross-compiling:** to avoid installing an ARM64 binary into an x64 IDA
+(where it could not load), cross-built addons are **not** auto-deployed — they are written
+to `<build>/ida-addons/<arch>/` instead. Force deployment (e.g. when `IDABIN` points at a
+matching ARM64 IDA) with `-DIDA_FORCE_DEPLOY=ON`. Native builds deploy as usual.
 
 ## Examples
 

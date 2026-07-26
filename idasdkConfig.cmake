@@ -1,19 +1,26 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Copyright (c) 2019-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# Copyright (c) Elias Bachaalany
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 # idasdkConfig.cmake
 # CMake package configuration for IDA SDK
 
-# Set IDASDK directory
-if(NOT DEFINED IDASDK)
+# Set IDASDK directory. A -DIDASDK=<path> cache variable takes precedence over
+# the IDASDK environment variable (bootstrap.cmake already applies this when used).
+if(NOT DEFINED IDASDK OR IDASDK STREQUAL "")
     if(DEFINED ENV{IDASDK})
         set(IDASDK "$ENV{IDASDK}")
     else()
-        message(FATAL_ERROR "IDASDK environment variable not set")
+        message(FATAL_ERROR "IDASDK not set. Pass -DIDASDK=<path> or set the IDASDK environment variable.")
     endif()
+endif()
+
+# Auto-detect GitHub SDK layout (files under src/) for the no-bootstrap path,
+# so -DIDASDK may point at either the SDK root or its src/ directory.
+if(NOT EXISTS "${IDASDK}/include/pro.h" AND EXISTS "${IDASDK}/src/include/pro.h")
+    set(IDASDK "${IDASDK}/src")
 endif()
 
 # Set IDABIN directory (default to $IDASDK/bin if not specified)
