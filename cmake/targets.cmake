@@ -228,7 +228,11 @@ function(ida_add_plugin NAME)
         find_package(Qt6 QUIET COMPONENTS ${PLUGIN_QT_COMPONENTS})
 
         if(NOT Qt6_FOUND)
-            message(STATUS "${NAME}: Qt6 not found, skipping Qt plugin (run: cmake --build . --target build_qt)")
+            if(IDA_CMAKE_ENABLE_QT_BUILD)
+                message(STATUS "${NAME}: Qt6 not found, skipping Qt plugin (run: cmake --build . --target build_qt)")
+            else()
+                message(STATUS "${NAME}: Qt6 not found, skipping Qt plugin (reconfigure with -DIDA_CMAKE_ENABLE_QT_BUILD=ON to build Qt)")
+            endif()
             return()
         endif()
 

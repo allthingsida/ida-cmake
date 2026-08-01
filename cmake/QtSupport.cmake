@@ -15,12 +15,20 @@
 #   - Cross-platform: Windows, Linux, macOS
 #
 # Usage:
-#   cmake --build build --target build_qt  # Build Qt (once, ~2 hours)
-#   cmake -B build                          # Reconfigure (finds Qt)
-#   cmake --build build                     # Build with Qt support
+#   cmake -B build -DIDA_CMAKE_ENABLE_QT_BUILD=ON  # Opt in to building Qt from source
+#   cmake --build build --target build_qt          # Build Qt (once, ~1-2 hours)
+#   cmake -B build                                  # Reconfigure (finds Qt)
+#   cmake --build build                             # Build with Qt support
 # =================================================================
 
-include(ExternalProject)
+# Building Qt from source is an expensive, rarely-needed operation (~1-2 hours,
+# ~2GB download+build). It is OFF by default, so the `build_qt` target and its Qt6
+# ExternalProject are not even created for the ~99% of builds that never compile Qt.
+# Enable it only when you actually need to build Qt:
+#   cmake -B build -DIDA_CMAKE_ENABLE_QT_BUILD=ON
+# Auto-detection of an already-built Qt (below) ALWAYS runs, so a plugin can still
+# opt in to Qt (find_package(Qt6)) without this flag once Qt has been built once.
+option(IDA_CMAKE_ENABLE_QT_BUILD "Build Qt6 from source (creates the build_qt target)" OFF)
 
 # Qt configuration
 set(QT_VERSION "6.8.2" CACHE STRING "Qt version to build")
@@ -37,8 +45,11 @@ if(EXISTS "${QT_INSTALL_PREFIX}/lib/cmake/Qt6")
 endif()
 
 # =================================================================
-# build_qt target: Build Qt6 from source
+# build_qt target: Build Qt6 from source (only when explicitly enabled)
 # =================================================================
+if(IDA_CMAKE_ENABLE_QT_BUILD)
+
+include(ExternalProject)
 
 # Platform-specific Qt configure options
 if(WIN32)
@@ -143,10 +154,17 @@ add_custom_target(build_qt
     VERBATIM
 )
 
-# Help message
+endif() # IDA_CMAKE_ENABLE_QT_BUILD
+
+# Help message (only when Qt isn't already available)
 if(NOT Qt6_FOUND AND NOT TARGET Qt6::Core)
     message(STATUS "================================================================")
-    message(STATUS "Qt6 not found. To build Qt plugins (qproject, qwindow):")
-    message(STATUS "  cmake --build ${CMAKE_BINARY_DIR} --target build_qt")
+    if(IDA_CMAKE_ENABLE_QT_BUILD)
+        message(STATUS "Qt6 not found. To build Qt plugins (qproject, qwindow):")
+        message(STATUS "  cmake --build ${CMAKE_BINARY_DIR} --target build_qt")
+    else()
+        message(STATUS "Qt6 not found - Qt plugins (qproject, qwindow) are disabled.")
+        message(STATUS "  To build Qt from source, reconfigure with -DIDA_CMAKE_ENABLE_QT_BUILD=ON")
+    endif()
     message(STATUS "================================================================")
 endif()
